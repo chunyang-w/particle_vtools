@@ -8,6 +8,8 @@ from particle_vtools.FluidStructure import FluidIterator_CT
 from particle_vtools.Particle import ParticleIterator_DF
 
 # Scaling factor - larger factor means smaller image
+# a larger factore will accelerate the rendering
+
 down_sample_factor = 8
 
 # Change the paths to fit your data location
