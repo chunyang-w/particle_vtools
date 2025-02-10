@@ -101,7 +101,7 @@ class Explorer3D:
                 if self.velocity_arrows[i] is not None:
                     self.plotter.remove_actor(self.velocity_arrows[i])
                 # Generate new velocity arrows
-                velocity_arrow_i = velocity_iterator.get_velocity(frame_idx)
+                velocity_arrow_i = velocity_iterator.get_glyph(frame_idx)
                 self.velocity_arrows[i] = self.plotter.add_mesh(
                     velocity_arrow_i, cmap=self.particle_cmap)
 

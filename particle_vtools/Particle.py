@@ -19,12 +19,26 @@ class ParticleIterator(ABC):
         self.name = name
 
     @abstractmethod
-    def get_velocity(self, index):
+    def get_particle(self, index):
+        pass
+
+    def get_glyph(self, index):
         """
         Abstract method that should return a mesh representing the pore
         surface.
         """
-        pass
+        positions, velocities, vel_mags = self.get_particle(index)
+        points = pv.PolyData(positions)
+        points['velocity'] = velocities
+        points['velMags'] = vel_mags
+        arrow = pv.Arrow()
+        glyphs = points.glyph(
+            orient='velocity',
+            scale='velMags',
+            color_mode='scale',
+            factor=4,
+            geom=arrow)
+        return glyphs
 
     @abstractmethod
     def __len__(self):
@@ -37,7 +51,7 @@ class ParticleIterator(ABC):
         """
         Supports indexing and slicing.
         """
-        return self.get_velocity(index)
+        return self.get_glyph(index)
 
     def __iter__(self):
         """
@@ -77,21 +91,15 @@ class ParticleIterator_DF(ParticleIterator):
         df_frame = self.df[self.df[self.frame_key] == index].copy()
         return df_frame
 
-    def get_velocity(self, index):
+    def get_particle(self, index):
         # Read the TIFF file
         df_frame = self.get_frame(index)
         positions = df_frame[['x', 'y', 'z']].to_numpy() + self.shift
         velocities = df_frame[['vx', 'vy', 'vz']].to_numpy()
         vel_mags = df_frame['velMags'].to_numpy()
 
-        points = pv.PolyData(positions)
-        points['velocity'] = velocities
-        points['velMags'] = vel_mags
-        arrow = pv.Arrow()
-        glyphs = points.glyph(
-            orient='velocity',
-            scale='velMags',
-            color_mode='scale',
-            factor=4,
-            geom=arrow)
-        return glyphs
+        positions = positions
+        velocities = velocities
+        vel_mags = vel_mags
+
+        return positions, velocities, vel_mags
