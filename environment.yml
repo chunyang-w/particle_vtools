@@ -1,0 +1,16 @@
+name: particle-vtools
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip:
+      - numpy
+      - pandas
+      - natsort
+      - pyvista
+      - matplotlib
+      - imagecodecs
+      - scikit-image
+      - ipykernel
+      - ipython
