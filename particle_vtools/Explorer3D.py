@@ -64,11 +64,11 @@ class Explorer3D:
                     fluid_mesh,
                     color="blue",
                     opacity=self.surface_transparency)
-                # self.plotter.add_mesh_clip_plane(
-                #     fluid_mesh,
-                #     normal='-z',
-                #     origin=fluid_mesh.center,
-                #     color="blue", outline_opacity=0.1)
+                self.plotter.add_mesh_clip_plane(
+                    fluid_mesh,
+                    normal='-z',
+                    origin=fluid_mesh.center,
+                    color="blue", outline_opacity=0.1)
 
         # set particle velocity arrow
         if self.velocity_iterators is not None:
@@ -79,12 +79,12 @@ class Explorer3D:
                 self.velocity_arrows.append(actor)
 
         # set pore structure
-        # if self.pore_structure is not None:
-        #     pore_mesh = self.pore_structure.get_surface()
-        #     self.plotter.add_mesh_clip_plane(
-        #         pore_mesh,
-        #         normal='x', origin=pore_mesh.center,
-        #         color="grey")
+        if self.pore_structure is not None:
+            pore_mesh = self.pore_structure.get_surface()
+            self.plotter.add_mesh_clip_plane(
+                pore_mesh,
+                normal='x', origin=pore_mesh.center,
+                color="grey")
 
     def update_scene3d(self, frame_idx):
         frame_idx = int(frame_idx)

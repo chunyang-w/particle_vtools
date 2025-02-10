@@ -83,8 +83,6 @@ class ParticleIterator_DF(ParticleIterator):
         positions = df_frame[['x', 'y', 'z']].to_numpy() + self.shift
         velocities = df_frame[['vx', 'vy', 'vz']].to_numpy()
         vel_mags = df_frame['velMags'].to_numpy()
-        if self.clip_val is not None:
-            vel_mags = np.clip(vel_mags, 0, self.clip_val)
 
         points = pv.PolyData(positions)
         points['velocity'] = velocities

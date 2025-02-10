@@ -2,6 +2,7 @@
 
 Tool set used to visulise & explore paticles in porous media.
 
+<img width="973" alt="image" src="https://github.com/user-attachments/assets/71f2aa30-8388-4164-8d9d-30d209fc0e29" />
 
 
 ## Enviroment installation:
