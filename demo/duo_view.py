@@ -79,7 +79,9 @@ if __name__ == "__main__":
     )
 
     p = pv.Plotter(
-        shape=(1, 2), window_size=[2000, 1000])
+        title="Particle Prediction vs Ground Truth",
+        shape=(1, 2),
+        window_size=[2000, 1000])
     # p.show_grid()
 
     # Init explorer
