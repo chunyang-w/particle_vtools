@@ -1,6 +1,5 @@
 import glob
 import pyvista as pv
-import numpy as np
 
 from natsort import natsorted
 
@@ -14,7 +13,7 @@ import argparse
 parser = argparse.ArgumentParser(
     description="Particle Prediction vs Ground Truth Visualization")
 parser.add_argument(
-    "--save_fig", type=bool, default=True, help="Set to True to save the gif")
+    "--save_fig", type=bool, default=False, help="Set to True to save the gif")
 parser.add_argument(
     "--move_camera", type=bool, default=True, help="Set to True to move the camera for a better 3D view")  # noqa
 parser.add_argument(
