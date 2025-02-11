@@ -10,11 +10,11 @@ from particle_vtools.FluidStructure import FluidIterator_CT
 from particle_vtools.Particle import ParticleIterator_DF
 
 # Set to True to save the gif
-save_fig = True
+save_fig = False
 # Set to True to remove the camera - create a better 3d view
-move_camera = True
+move_camera = False
 num_frames = 20
-show_clip_panel = False
+show_clip_panel = True
 # Scaling factor - larger factor means smaller image
 # a larger factore will accelerate the rendering
 
