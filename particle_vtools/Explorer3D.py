@@ -29,6 +29,7 @@ class Explorer3D:
         particle_cmap="jet",
         plotter=None,
         clip_panel=True,
+        clim=[0, 7],
     ):
         self.pore_structure = pore_structure
         self.fluid_iterators = fluid_iterators
@@ -38,6 +39,7 @@ class Explorer3D:
         self.particle_cmap = particle_cmap
         self.plotter = plotter
         self.clip_panel = clip_panel
+        self.clim = clim
 
         self.setup(bg_color)
         self.set_light()
@@ -82,8 +84,15 @@ class Explorer3D:
         if self.velocity_iterators is not None:
             for velocity_iterator in self.velocity_iterators:
                 velocity = velocity_iterator[frame_idx]
-                actor = self.plotter.add_mesh(velocity,
-                                              cmap=self.particle_cmap)
+                actor = self.plotter.add_mesh(
+                    velocity,
+                    # cmap=self.particle_cmap,
+                    cmap=self.particle_cmap,
+                    clim=self.clim,
+                    scalar_bar_args={
+                        'title': "Velocity Magnitude"
+                        },
+                )
                 self.velocity_arrows.append(actor)
 
         # set pore structure
@@ -111,10 +120,14 @@ class Explorer3D:
                     self.plotter.remove_actor(self.velocity_arrows[i])
                 # Generate new velocity arrows
                 velocity_arrow_i = velocity_iterator[frame_idx]
+                # actor.SetVisibility(True)
                 self.velocity_arrows[i] = self.plotter.add_mesh(
                     velocity_arrow_i,
                     cmap=self.particle_cmap,
-                    # show_scalar_bar=False,
+                    clim=self.clim,
+                    scalar_bar_args={
+                        'title': "Velocity Magnitude"
+                        },
                     )
 
     def set_time_slider(self, start=0):

@@ -8,17 +8,29 @@ from particle_vtools.Explorer3D import Explorer3D
 from particle_vtools.PoreStructure import PoreStructure_CT
 from particle_vtools.FluidStructure import FluidIterator_CT
 from particle_vtools.Particle import ParticleIterator_DF
+import argparse
 
-# Set to True to save the gif
-save_fig = False
-# Set to True to remove the camera - create a better 3d view
-move_camera = False
-num_frames = 20
-show_clip_panel = True
-# Scaling factor - larger factor means smaller image
-# a larger factore will accelerate the rendering
+# Parse command line arguments
+parser = argparse.ArgumentParser(
+    description="Particle Prediction vs Ground Truth Visualization")
+parser.add_argument(
+    "--save_fig", type=bool, default=True, help="Set to True to save the gif")
+parser.add_argument(
+    "--move_camera", type=bool, default=True, help="Set to True to move the camera for a better 3D view")  # noqa
+parser.add_argument(
+    "--num_frames", type=int, default=20, help="Number of frames to render")
+parser.add_argument(
+    "--show_clip_panel", type=bool, default=False, help="Set to True to show the clip panel")  # noqa
+parser.add_argument(
+    "--down_sample_factor", type=int, default=8, help="Scaling factor - larger factor means smaller image")  # noqa
 
-down_sample_factor = 8
+args = parser.parse_args()
+
+save_fig = args.save_fig
+move_camera = args.move_camera
+num_frames = args.num_frames
+show_clip_panel = args.show_clip_panel
+down_sample_factor = args.down_sample_factor
 
 # Change the paths to fit your data location
 pore_tif_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/073_segmented_00000.tif"  # noqa
@@ -127,10 +139,9 @@ if __name__ == "__main__":
         p.show()
 
     elif save_fig:
-        # p.show()
+        p.open_gif(f"compare_move_camera_{move_camera}.gif", fps=1.2)
         p.camera_position = "yz"
-        p.camera.azimuth = 100
-        p.open_gif("compare.gif", fps=1.2)
+        p.camera.azimuth = 120
         text_actor = p.add_text(
             "Frame: 0", position="upper_right", font_size=20)
         p.camera.zoom(1.2)
@@ -141,6 +152,6 @@ if __name__ == "__main__":
             update_duo_view(i)
             j = i / 10
             if move_camera:
-                p.camera.azimuth = p.camera.azimuth + j*2
+                p.camera.azimuth = p.camera.azimuth - j*2
             p.write_frame()
         p.close()

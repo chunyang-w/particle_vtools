@@ -2,3 +2,5 @@ notebook/*
 *.egg-info/*
 demo/073_pred.py
 */__pycache__/*
+
+compare*
