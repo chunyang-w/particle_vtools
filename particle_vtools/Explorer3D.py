@@ -74,6 +74,7 @@ class Explorer3D:
         if self.velocity_iterators is not None:
             for velocity_iterator in self.velocity_iterators:
                 velocity = velocity_iterator[frame_idx]
+                print(velocity)
                 actor = self.plotter.add_mesh(velocity,
                                               cmap=self.particle_cmap)
                 self.velocity_arrows.append(actor)
@@ -101,15 +102,16 @@ class Explorer3D:
                 if self.velocity_arrows[i] is not None:
                     self.plotter.remove_actor(self.velocity_arrows[i])
                 # Generate new velocity arrows
-                velocity_arrow_i = velocity_iterator.get_glyph(frame_idx)
+                velocity_arrow_i = velocity_iterator[frame_idx]
                 self.velocity_arrows[i] = self.plotter.add_mesh(
                     velocity_arrow_i, cmap=self.particle_cmap)
 
-    def set_time_slider(self):
-        self.set_scene3d(0)
+    def set_time_slider(self, start=0):
+        start = start
+        end = start + self.num_frames - 1
         self.plotter.add_slider_widget(
             self.update_scene3d,
-            [0, self.num_frames - 1],
+            [start, end],
             title='Frame', value=0)
 
     def auto_animation(self):

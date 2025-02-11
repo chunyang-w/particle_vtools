@@ -10,7 +10,7 @@ def tif_2_geo(tif_file, threshold=0, down_sample_factor=4):
     """
     img = tif_file
     img = img[::down_sample_factor, ::down_sample_factor, ::down_sample_factor]
-    verts, faces, _, _ = measure.marching_cubes(img, level=0)
+    verts, faces, _, _ = measure.marching_cubes(img, level=threshold)
     verts = verts * down_sample_factor
     return verts, faces
 

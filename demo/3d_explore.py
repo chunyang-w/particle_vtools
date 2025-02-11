@@ -24,6 +24,7 @@ if __name__ == "__main__":
     rock_surface = PoreStructure_CT(
         pore_tif_path,  # noqa
         scale=2,
+        threshold=0,
         down_sample_factor=down_sample_factor,
         permute_axes=(2, 1, 0))
     rock_surface.tif_data = rock_surface.tif_data[230:, :, :]
@@ -32,17 +33,18 @@ if __name__ == "__main__":
     ct_files = glob.glob(ct_files_path) # noqa
     ct_files = natsorted(ct_files)
     oil_iterator = FluidIterator_CT(
-        "oil", ct_files, 1,
+        "oil", ct_files, threshold=0,
         permute_axes=(2, 1, 0),
         down_sample_factor=down_sample_factor,
         slicer=fluid_slicer)
     # Particle data
-    particle_df_path = particle_df_path# noqa
+    particle_df_path = particle_df_path # noqa
     paricle_iterator = ParticleIterator_DF("particle", particle_df_path, shift_array=shift)  # noqa
 
     # Init explorer
     explorer = Explorer3D([oil_iterator], [paricle_iterator], rock_surface)
 
     # set time slider
+    explorer.set_scene3d(0)
     explorer.set_time_slider()
     explorer.explore()

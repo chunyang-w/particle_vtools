@@ -15,8 +15,12 @@ from abc import ABC, abstractmethod
 
 
 class ParticleIterator(ABC):
-    def __init__(self, name):
+    def __init__(self,
+                 name,
+                 frame_start=0,
+                 ):
         self.name = name
+        self.frame_start = frame_start
 
     @abstractmethod
     def get_particle(self, index):
@@ -27,16 +31,14 @@ class ParticleIterator(ABC):
         Abstract method that should return a mesh representing the pore
         surface.
         """
-        positions, velocities, vel_mags = self.get_particle(index)
+        positions, velocities = self.get_particle(index)
         points = pv.PolyData(positions)
         points['velocity'] = velocities
-        points['velMags'] = vel_mags
         arrow = pv.Arrow()
         glyphs = points.glyph(
             orient='velocity',
-            scale='velMags',
             color_mode='scale',
-            factor=4,
+            factor=8,
             geom=arrow)
         return glyphs
 
@@ -51,6 +53,7 @@ class ParticleIterator(ABC):
         """
         Supports indexing and slicing.
         """
+        index = self.frame_start + index
         return self.get_glyph(index)
 
     def __iter__(self):
@@ -77,12 +80,25 @@ class ParticleIterator_DF(ParticleIterator):
                  name,
                  df_path,
                  frame_key='frame',
+                 x_key='x',
+                 y_key='y',
+                 z_key='z',
+                 vx_key='vx',
+                 vy_key='vy',
+                 vz_key='vz',
                  shift_array=np.array([0, 0, 0]).reshape(-1, 3),
+                 frame_start=0,
                  ):
-        super().__init__(name)
+        super().__init__(name, frame_start)
         self.df = pd.read_csv(df_path)
         self.frame_key = frame_key
         self.shift = shift_array
+        self.x_key = x_key
+        self.y_key = y_key
+        self.z_key = z_key
+        self.vx_key = vx_key
+        self.vy_key = vy_key
+        self.vz_key = vz_key
 
     def __len__(self):
         return self.df[self.frame_key].nunique()
@@ -94,12 +110,12 @@ class ParticleIterator_DF(ParticleIterator):
     def get_particle(self, index):
         # Read the TIFF file
         df_frame = self.get_frame(index)
-        positions = df_frame[['x', 'y', 'z']].to_numpy() + self.shift
-        velocities = df_frame[['vx', 'vy', 'vz']].to_numpy()
-        vel_mags = df_frame['velMags'].to_numpy()
+        positions = df_frame[
+            [self.x_key, self.y_key, self.z_key]].to_numpy() + self.shift
+        velocities = df_frame[
+            [self.vx_key, self.vy_key, self.vz_key]].to_numpy()
 
         positions = positions
         velocities = velocities
-        vel_mags = vel_mags
 
-        return positions, velocities, vel_mags
+        return positions, velocities
