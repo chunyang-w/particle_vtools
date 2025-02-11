@@ -12,8 +12,9 @@ from particle_vtools.Particle import ParticleIterator_DF
 # Set to True to save the gif
 save_fig = True
 # Set to True to remove the camera - create a better 3d view
-move_camera = False
-num_frames = 5
+move_camera = True
+num_frames = 20
+show_clip_panel = False
 # Scaling factor - larger factor means smaller image
 # a larger factore will accelerate the rendering
 
@@ -79,6 +80,7 @@ if __name__ == "__main__":
 
     p = pv.Plotter(
         shape=(1, 2), window_size=[2000, 1000])
+    # p.show_grid()
 
     # Init explorer
     explorer_pred = Explorer3D(
@@ -87,7 +89,7 @@ if __name__ == "__main__":
         pore_structure=rock_surface,
         num_frames=20,
         plotter=p,
-        clip_panel=False,
+        clip_panel=show_clip_panel,
         )
 
     explorer_ground = Explorer3D(
@@ -96,7 +98,7 @@ if __name__ == "__main__":
         pore_structure=rock_surface,
         num_frames=20,
         plotter=p,
-        clip_panel=False,
+        clip_panel=show_clip_panel,
         )
 
     def update_duo_view(frame_idx):
@@ -104,9 +106,9 @@ if __name__ == "__main__":
         explorer_pred.update_scene3d(frame_idx)
         p.subplot(0, 1)
         explorer_ground.update_scene3d(frame_idx)
-
     p.subplot(0, 0)
     p.add_text("Ground Truth", font_size=20)
+
     explorer_ground.set_scene3d(0)
     p.subplot(0, 1)
     p.add_text("Prediction", font_size=20)
@@ -116,26 +118,27 @@ if __name__ == "__main__":
     if not save_fig:
         p.add_slider_widget(
             update_duo_view,
-            [0, 20],
-            title='Time',
+            [0, 19],
+            value=0,
+            title='Frame',
         )
         p.show()
 
     elif save_fig:
         # p.show()
-        p.open_gif("compare.gif", fps=1.5)
-        text_actor = p.add_text(f"Frame: 0", position="upper_right", font_size=20)
+        p.camera_position = "yz"
+        p.camera.azimuth = 100
+        p.open_gif("compare.gif", fps=1.2)
+        text_actor = p.add_text(
+            "Frame: 0", position="upper_right", font_size=20)
         p.camera.zoom(1.2)
         for i in range(num_frames):
             p.remove_actor(text_actor)
-            text_actor = p.add_text(f"Frame: {i}", position="upper_right", font_size=20)
+            text_actor = p.add_text(
+                f"Frame: {i}", position="upper_right", font_size=20)
             update_duo_view(i)
             j = i / 10
             if move_camera:
-                p.camera_position = [
-                    (15 * np.cos(j * np.pi / 45.0), 5.0, 15 * np.sin(j * np.pi / 45.0)), # noqa
-                    (0, 0, 0),
-                    (0, 1, 0),
-                ]
+                p.camera.azimuth = p.camera.azimuth + j*2
             p.write_frame()
         p.close()

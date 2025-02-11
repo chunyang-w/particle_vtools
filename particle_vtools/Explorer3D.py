@@ -25,7 +25,7 @@ class Explorer3D:
         pore_structure=None,
         num_frames=100,
         bg_color="white",
-        surface_transparency=0.04,
+        surface_transparency=0.05,
         particle_cmap="jet",
         plotter=None,
         clip_panel=True,
@@ -66,6 +66,10 @@ class Explorer3D:
                 self.plotter.add_mesh(
                     fluid_mesh,
                     color="blue",
+                    pbr=True,
+                    metallic=0.1,
+                    roughness=0.01,
+                    diffuse=1,
                     opacity=self.surface_transparency)
                 if self.clip_panel:
                     self.plotter.add_mesh_clip_plane(
@@ -110,7 +114,7 @@ class Explorer3D:
                 self.velocity_arrows[i] = self.plotter.add_mesh(
                     velocity_arrow_i,
                     cmap=self.particle_cmap,
-                    show_scalar_bar=False,
+                    # show_scalar_bar=False,
                     )
 
     def set_time_slider(self, start=0):
