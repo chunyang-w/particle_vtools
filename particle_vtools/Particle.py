@@ -38,7 +38,7 @@ class ParticleIterator(ABC):
         glyphs = points.glyph(
             orient='velocity',
             color_mode='scale',
-            factor=8,
+            factor=10,
             geom=arrow)
         return glyphs
 

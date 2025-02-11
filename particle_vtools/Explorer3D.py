@@ -27,6 +27,8 @@ class Explorer3D:
         bg_color="white",
         surface_transparency=0.04,
         particle_cmap="jet",
+        plotter=None,
+        clip_panel=True,
     ):
         self.pore_structure = pore_structure
         self.fluid_iterators = fluid_iterators
@@ -34,6 +36,8 @@ class Explorer3D:
         self.num_frames = num_frames
         self.surface_transparency = surface_transparency
         self.particle_cmap = particle_cmap
+        self.plotter = plotter
+        self.clip_panel = clip_panel
 
         self.setup(bg_color)
         self.set_light()
@@ -41,13 +45,12 @@ class Explorer3D:
         self.fluid_surfaces = []
         self.velocity_arrows = []
 
-        print(len(self.velocity_iterators), "velocity iterators")
-
     def setup(self, bg_color):
-        self.plotter = pv.Plotter(
-            window_size=[1600, 1600],
-            title="Particle-vtools (3D Explorer)")
-        pv.global_theme.background = bg_color
+        if self.plotter is None:
+            self.plotter = pv.Plotter(
+                window_size=[1600, 1600],
+                title="Particle-vtools (3D Explorer)")
+            pv.global_theme.background = bg_color
 
     def set_light(self):
         light = pv.Light()
@@ -64,17 +67,17 @@ class Explorer3D:
                     fluid_mesh,
                     color="blue",
                     opacity=self.surface_transparency)
-                self.plotter.add_mesh_clip_plane(
-                    fluid_mesh,
-                    normal='-z',
-                    origin=fluid_mesh.center,
-                    color="blue", outline_opacity=0.1)
+                if self.clip_panel:
+                    self.plotter.add_mesh_clip_plane(
+                        fluid_mesh,
+                        normal='-z',
+                        origin=fluid_mesh.center,
+                        color="blue", outline_opacity=0.1)
 
         # set particle velocity arrow
         if self.velocity_iterators is not None:
             for velocity_iterator in self.velocity_iterators:
                 velocity = velocity_iterator[frame_idx]
-                print(velocity)
                 actor = self.plotter.add_mesh(velocity,
                                               cmap=self.particle_cmap)
                 self.velocity_arrows.append(actor)
@@ -82,10 +85,11 @@ class Explorer3D:
         # set pore structure
         if self.pore_structure is not None:
             pore_mesh = self.pore_structure.get_surface()
-            self.plotter.add_mesh_clip_plane(
-                pore_mesh,
-                normal='x', origin=pore_mesh.center,
-                color="grey")
+            if self.clip_panel:
+                self.plotter.add_mesh_clip_plane(
+                    pore_mesh,
+                    normal='x', origin=pore_mesh.center,
+                    color="grey")
 
     def update_scene3d(self, frame_idx):
         frame_idx = int(frame_idx)
@@ -104,7 +108,10 @@ class Explorer3D:
                 # Generate new velocity arrows
                 velocity_arrow_i = velocity_iterator[frame_idx]
                 self.velocity_arrows[i] = self.plotter.add_mesh(
-                    velocity_arrow_i, cmap=self.particle_cmap)
+                    velocity_arrow_i,
+                    cmap=self.particle_cmap,
+                    show_scalar_bar=False,
+                    )
 
     def set_time_slider(self, start=0):
         start = start
