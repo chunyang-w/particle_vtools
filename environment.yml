@@ -5,6 +5,8 @@ channels:
 dependencies:
   - python=3.10
   - pip:
+      - ipykernel
+      - ipython
       - numpy
       - pandas
       - natsort
@@ -12,5 +14,5 @@ dependencies:
       - matplotlib
       - imagecodecs
       - scikit-image
-      - ipykernel
-      - ipython
+      - trame
+      - ipywidgets

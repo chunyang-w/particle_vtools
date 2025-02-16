@@ -119,14 +119,32 @@ if __name__ == "__main__":
         explorer_pred.update_scene3d(frame_idx)
         p.subplot(0, 1)
         explorer_ground.update_scene3d(frame_idx)
+
     p.subplot(0, 0)
+    p.show_grid(
+        all_edges=True,
+        show_xlabels=False,
+        show_ylabels=False,
+        show_zlabels=False,
+    )
     p.add_text("Ground Truth", font_size=20)
 
     explorer_ground.set_scene3d(0)
     p.subplot(0, 1)
+    p.show_grid(
+        all_edges=True,
+        show_xlabels=False,
+        show_ylabels=False,
+        show_zlabels=False,
+    )
+
     p.add_text("Prediction", font_size=20)
     explorer_pred.set_scene3d(0)
     p.link_views()
+
+    p.camera_position = "yz"
+    p.camera.azimuth = -30
+    p.camera.elevation = 15
 
     if not save_fig:
         p.add_slider_widget(
@@ -139,8 +157,7 @@ if __name__ == "__main__":
 
     elif save_fig:
         p.open_gif(f"compare_move_camera_{move_camera}.gif", fps=1.2)
-        p.camera_position = "yz"
-        p.camera.azimuth = 120
+
         text_actor = p.add_text(
             "Frame: 0", position="upper_right", font_size=20)
         p.camera.zoom(1.2)
