@@ -18,9 +18,37 @@ class ParticleIterator(ABC):
     def __init__(self,
                  name,
                  frame_start=0,
+                 arrow_lim=(0.1, 3),
                  ):
         self.name = name
         self.frame_start = frame_start
+        self.arrow_min, self.arrow_max = arrow_lim
+
+    def compute_velocity_magnitudes(self, velocities):
+        """
+        Compute the vector magnitudes (L2 norm) of velocity vectors.
+        velocities: shape (N, 3)
+        returns: shape (N,) with each magnitude
+        """
+        return np.linalg.norm(velocities, axis=1)
+
+    def map_magnitudes_to_size(self, magnitudes, low, high):
+        """
+        Map magnitudes [min, max] -> [low, high] (linear mapping/clamping)
+        If you just want to clamp, you can use np.clip directly.
+        """
+        # First find global min & max from your data or from magnitudes
+        mag_min = magnitudes.min()
+        mag_max = magnitudes.max()
+        # Avoid division by zero
+        denom = max(mag_max - mag_min, 1e-12)
+
+        # Linear mapping
+        scaled = low + (magnitudes - mag_min) * (high - low) / denom
+
+        # Clamp to [low, high] just in case
+        scaled = np.clip(scaled, low, high)
+        return scaled
 
     @abstractmethod
     def get_particle(self, index):
@@ -31,15 +59,32 @@ class ParticleIterator(ABC):
         Abstract method that should return a mesh representing the pore
         surface.
         """
+        arrow_min = self.arrow_min
+        arrow_max = self.arrow_max
+
         positions, velocities = self.get_particle(index)
+        magnitudes = self.compute_velocity_magnitudes(velocities)
+        arrow_sizes = self.map_magnitudes_to_size(
+            magnitudes, arrow_min, arrow_max)
+
+        # print("min/max arrow sizes:", arrow_sizes.min(), arrow_sizes.max())
+        # print("min/max magnitudes:", magnitudes.min(), magnitudes.max())
+
         points = pv.PolyData(positions)
         points['velocity'] = velocities
+        points["mags"] = magnitudes            # For coloring
+        points["arrowScale"] = arrow_sizes     # For sizing the glyphs
+
+        points.set_active_scalars("mags")
+        print(points.active_scalars_name)
         arrow = pv.Arrow()
         glyphs = points.glyph(
             orient='velocity',
-            color_mode='scale',
+            scale='arrowScale',
+            color_mode='scalar',
             factor=15,
             geom=arrow)
+        glyphs.set_active_scalars("mags")
         return glyphs
 
     @abstractmethod
@@ -88,8 +133,9 @@ class ParticleIterator_DF(ParticleIterator):
                  vz_key='vz',
                  shift_array=np.array([0, 0, 0]).reshape(-1, 3),
                  frame_start=0,
+                 **kwargs
                  ):
-        super().__init__(name, frame_start)
+        super().__init__(name, frame_start, **kwargs)
         self.df = pd.read_csv(df_path)
         self.frame_key = frame_key
         self.shift = shift_array

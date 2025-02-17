@@ -11,6 +11,8 @@ from particle_vtools.Particle import ParticleIterator_DF
 # a larger factore will accelerate the rendering
 
 down_sample_factor = 8
+clim = [0, 10]
+arrow_lim = [0.5, 5]
 
 # Change the paths to fit your data location
 pore_tif_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/073_segmented_00000.tif"  # noqa
@@ -39,10 +41,20 @@ if __name__ == "__main__":
         slicer=fluid_slicer)
     # Particle data
     particle_df_path = particle_df_path # noqa
-    paricle_iterator = ParticleIterator_DF("particle", particle_df_path, shift_array=shift)  # noqa
+    paricle_iterator = ParticleIterator_DF(
+        "particle",
+        particle_df_path,
+        shift_array=shift,
+        arrow_lim=arrow_lim,
+        )
 
     # Init explorer
-    explorer = Explorer3D([oil_iterator], [paricle_iterator], rock_surface)
+    explorer = Explorer3D(
+        [oil_iterator],
+        [paricle_iterator],
+        rock_surface,
+        clim=clim,
+        )
 
     # set time slider
     explorer.set_scene3d(0)

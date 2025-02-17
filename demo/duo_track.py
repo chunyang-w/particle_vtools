@@ -14,16 +14,18 @@ from particle_vtools.FluidStructure import FluidIterator_CT
 save_fig = True
 num_frames = 100
 
-drop_percent = 50
+drop_percent = 70
+clim_low = 0.2
+clim_high = 0.95
 
 down_sample_factor = 8
 scale = 2
 show_surface = True
 surface_idx = 0
 
-cmap = 'jet'
+cmap = 'plasma'
 line_width = 3
-opacity = 0.9
+opacity = 0.5
 
 pore_tif_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/073_segmented_00000.tif"  # noqa
 ct_files_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/*"  # noqa
@@ -148,6 +150,8 @@ p.add_mesh(
     cmap=cmap,
     render_lines_as_tubes=True,
     opacity=opacity,
+    clim=[np.quantile(track_ground['velocity'], clim_low),
+          np.quantile(track_ground['velocity'], clim_high)],
 )
 p.add_mesh(
     surface,
@@ -170,6 +174,8 @@ p.add_mesh(
     cmap=cmap,
     render_lines_as_tubes=True,
     opacity=opacity,
+    clim=[np.quantile(track_ground['velocity'], clim_low),
+          np.quantile(track_ground['velocity'], clim_high)],
 )
 p.add_mesh(
     surface,
