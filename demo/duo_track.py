@@ -11,7 +11,7 @@ from particle_vtools.FluidStructure import FluidIterator_CT
 # from particle_vtools.Particle import ParticleIterator_DF
 # import argparse
 
-save_fig = True
+save_fig = False
 num_frames = 100
 
 drop_percent = 70
@@ -23,7 +23,7 @@ scale = 2
 show_surface = True
 surface_idx = 0
 
-cmap = 'plasma'
+cmap = 'jet'
 line_width = 3
 opacity = 0.5
 
@@ -167,6 +167,7 @@ p.show_grid(
     show_ylabels=False,
     show_zlabels=False,
 )
+p.add_text("Prediction", font_size=20)
 p.add_mesh(
     track_pred,
     scalars='velocity',
