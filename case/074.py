@@ -21,25 +21,25 @@ down_sample_factor = 8
 clim = [0, 10]
 arrow_lim = [0.5, 5]
 
-# Change the paths to fit your data location
-pore_tif_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/073_segmented_00000.tif"  # noqa
-ct_files_path = "../data/072_combined_results/registered_cleanedAvizo/*"  # noqa
-particle_df_path = "../data/072_combined_results/trajectories/velocity_points_newversion_bp1_tsr6tm1tml20_surface_masked.csv"  # noqa
+# # Change the paths to fit your data location
+pore_tif_path = "../data/CombinedResults/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left7_compressed.tif"  # noqa
+# ct_files_path = "../data/CombinedResults/Segmentations/075_segmented_tifs/*"  # noqa
+# particle_df_path = "../data/CombinedResults/Velocity-TSR6_TM1_TML20/075_RobuGlass3_drainage_348nl_min_run6_velocityPoints_surface_masked.csv"  # noqa
+
+# pore_tif_path = "../data/CombinedResults/Segmentations/074_segmented_tifs/seg_frame0.tif"  # noqa
+ct_files_path = "../data/CombinedResults/Segmentations/074_segmented_tifs/*"  # noqa
+particle_df_path = "../data/CombinedResults/Velocity-TSR6_TM1_TML20/074_RobuGlass3_drainage_348nl_min_run6_velocityPoints_surface_masked.csv"  # noqa
 
 if __name__ == "__main__":
-    # The slicer is used to crop the fluid surface - this is optional
-    fluid_slicer = (slice(None, -50), slice(50, -50), slice(50, -50))
-    # shift array used to shift the particle data
-    shift = np.array([0, 0, -450]).reshape(-1, 3)
+    fluid_slicer = (slice(0, None), slice(0, None), slice(0, None))
+    shift = np.array([50, 50, 0]).reshape(-1, 3)
 
     rock_surface = PoreStructure_CT(
         pore_tif_path,  # noqa
-        scale=2,        # scale the image by two - the input image is too large this is optional  # noqa
-        threshold=0,    # threshold used in marching cube algo to generate the surface  # noqa
-        down_sample_factor=down_sample_factor, # down sample the image by 8 - this is optional  # noqa
-        permute_axes=(2, 1, 0))  # permute the axes - this is optional  # noqa
-    # delete this line if you do not want to crop the rock surface
-    rock_surface.tif_data = rock_surface.tif_data[230:, :, :]
+        scale=1,
+        threshold=0,
+        down_sample_factor=down_sample_factor,
+        permute_axes=(2, 1, 0))
 
     # Load the oil surface
     ct_files = glob.glob(ct_files_path) # noqa
@@ -67,6 +67,12 @@ if __name__ == "__main__":
         )
 
     # set time slider
+    explorer.plotter.show_grid(
+        all_edges=True,
+        # show_xlabels=False,
+        # show_ylabels=False,
+        # show_zlabels=False,
+    )
     explorer.set_scene3d(0)
     explorer.set_time_slider()
     explorer.explore()

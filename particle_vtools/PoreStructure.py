@@ -11,6 +11,7 @@ The entities are:
 """
 from abc import ABC, abstractmethod
 from skimage import io
+from sklearn.preprocessing import normalize
 from .utils import tif_2_geo, geo_2_mesh
 
 
@@ -48,6 +49,7 @@ class PoreStructure_CT(PoreStructure):
                  smooth_iter=10,
                  smooth_factor=0.5,
                  scale=None,
+                 expand_distance=10,
                  permute_axes=None,
                  slicer=None):
         self.tif_data = io.imread(tif_file)
@@ -58,6 +60,7 @@ class PoreStructure_CT(PoreStructure):
         self.scale = scale
         self.permute_axes = permute_axes
         self.slicer = slicer
+        self.expand_distance = expand_distance
 
     def get_geo(self):
         # Convert the TIFF data to geometry (vertices and faces)
@@ -80,4 +83,6 @@ class PoreStructure_CT(PoreStructure):
         mesh_surface = geo_2_mesh(
             verts, faces,
             smooth_iter=self.smooth_iter)
-        return mesh_surface
+        mesh = mesh_surface
+
+        return mesh

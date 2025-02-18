@@ -1,3 +1,15 @@
+"""
+Author Chunyang Wang
+Github: https://github.com/chunyang-w
+
+A Visulisation script utilising pyvista API to compare the particle tracking
+
+A 3D scene with two subplots is created to compare the particle tracking
+between the ground truth and the prediction.
+
+Two view are linked to facilitate the comparison.
+"""
+
 import glob
 import numpy as np
 import pandas as pd
