@@ -170,7 +170,6 @@ if __name__ == "__main__":
 
     elif save_fig:
         p.open_gif(f"compare_move_camera_{move_camera}.gif", fps=1.2)
-
         text_actor = p.add_text(
             "Frame: 0", position="upper_right", font_size=20)
         p.camera.zoom(1.2)

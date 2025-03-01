@@ -17,6 +17,9 @@ from particle_vtools.Particle import ParticleIterator_DF
 # Scaling factor - larger factor means smaller image
 # a larger factore will accelerate the rendering
 
+save_fig = False
+clip_panel = True
+
 down_sample_factor = 8
 clim = [0, 10]
 arrow_lim = [0.5, 5]
@@ -64,6 +67,7 @@ if __name__ == "__main__":
         [paricle_iterator],
         rock_surface,
         clim=clim,
+        clip_panel=clip_panel,
         )
 
     # set time slider
@@ -73,6 +77,35 @@ if __name__ == "__main__":
         # show_ylabels=False,
         # show_zlabels=False,
     )
+
+
+if not save_fig:
     explorer.set_scene3d(0)
     explorer.set_time_slider()
     explorer.explore()
+elif save_fig:
+    move_camera = True
+    num_frames = [i for i in range(45, 65, 1)]
+    p = explorer.plotter
+    explorer.set_scene3d(num_frames[0])
+    p.camera_position = "yz"
+    p.camera.azimuth = 130
+    p.camera.elevation = 15
+    p.camera.zoom(2)
+    p.open_gif("compare_flow_direction.gif", fps=2)
+    # p.open_movie("compare_flow_direction.mp4", framerate=2)
+
+    text_actor = p.add_text(
+        "Frame: 0", position="upper_right", font_size=20)
+
+    for i in num_frames:
+        p.write_frame()
+        p.remove_actor(text_actor)
+        text_actor = p.add_text(
+            f"Frame: {i}", position="upper_right", font_size=20)
+        explorer.update_scene3d(i)
+        j = i / 10
+        if move_camera:
+            # p.camera.azimuth = p.camera.azimuth - j*2
+            p.camera.elevation = p.camera.elevation + 1
+    p.close()

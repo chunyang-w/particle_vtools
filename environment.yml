@@ -17,3 +17,4 @@ dependencies:
       - trame
       - ipywidgets
       - scikit-learn
+      - trame-vtk
