@@ -39,6 +39,8 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+clim = [0, 0.5]
+
 save_fig = args.save_fig
 move_camera = args.move_camera
 frame_start = args.frame_start
@@ -116,6 +118,7 @@ if __name__ == "__main__":
         num_frames=20,
         plotter=p,
         clip_panel=show_clip_panel,
+        clim=clim,
         )
 
     explorer_ground = Explorer3D(
@@ -125,6 +128,7 @@ if __name__ == "__main__":
         num_frames=20,
         plotter=p,
         clip_panel=show_clip_panel,
+        clim=clim,
         )
 
     def update_duo_view(frame_idx):
