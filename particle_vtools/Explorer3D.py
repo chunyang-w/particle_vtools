@@ -60,6 +60,7 @@ class Explorer3D:
 
     def set_scene3d(self, frame_idx):
         frame_idx = int(frame_idx)
+        print("Setting scene to frame", frame_idx)
         # set fulid surface
         if self.fluid_iterators is not None:
             for fluid_iterator in self.fluid_iterators:

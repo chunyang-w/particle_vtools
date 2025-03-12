@@ -41,9 +41,12 @@ opacity = 0.5
 
 # pore_tif_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/073_segmented_00000.tif"  # noqa
 # ct_files_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/*"  # noqa
-particle_pred_df_path = "/Users/chunyang/Downloads/test2.csv"  # noqa
-particle_ground_df_path = "/Users/chunyang/Downloads/test2.csv"  # noqa
+particle_pred_df_path = "/Users/chunyang/Downloads/all_frames_UPT.csv"  # noqa
+particle_ground_df_path = "/Users/chunyang/Downloads/sinteredGlass_unsmoothed_velocityPoints.csv"  # noqa
 # ct_files_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/*"  # noqa
+
+frame_start = 48
+frame_end = 59
 
 # Load the oil surface
 # ct_files = glob.glob(ct_files_path) # noqa
@@ -68,22 +71,26 @@ def get_track(
         vy_key='pred_vy',
         vz_key='pred_vz',
         drop_percent=0.0,
+        frame_start=0,
+        frame_end=100,
+        id_key='particle_id'
         ):
     # Create trajectories for each particle
-    df = df.sort_values(['particle', 'frame'])
+    df = df.sort_values([id_key, 'frame'])
+    df = df[(df.frame >= frame_start) & (df.frame <= frame_end)]
 
     # Randomly select subset of particles
     keep_frac = (100 - drop_percent)/100
-    unique_ids = df['particle'].unique()
+    unique_ids = df[id_key].unique()
     selected_ids = np.random.choice(
             unique_ids,
             size=int(len(unique_ids)*keep_frac),
             replace=False)
-    df = df[df.particle.isin(selected_ids)]
+    df = df[df[id_key].isin(selected_ids)]
 
     lines = []
     velocities = []
-    particle_groups = df.groupby('particle')
+    particle_groups = df.groupby(id_key)
 
     for pid, particle_data in particle_groups:
         # Extract ordered points for this particle
@@ -122,13 +129,16 @@ def get_track(
 pred_df = pd.read_csv(particle_pred_df_path)
 track_pred = get_track(
     df=pred_df,
-    x_key='x_pred',
-    y_key='y_pred',
-    z_key='z_pred',
-    vx_key='vx_pred',
-    vy_key='vy_pred',
-    vz_key='vz_pred',
+    x_key='x',
+    y_key='y',
+    z_key='z',
+    vx_key='vx',
+    vy_key='vy',
+    vz_key='vz',
+    id_key="particle",
     drop_percent=drop_percent,
+    frame_start=frame_start,
+    frame_end=frame_end,
 )
 
 ground_df = pd.read_csv(particle_ground_df_path)
@@ -140,7 +150,10 @@ track_ground = get_track(
     vx_key='vx',
     vy_key='vy',
     vz_key='vz',
+    id_key="particle",
     drop_percent=drop_percent,
+    frame_start=frame_start,
+    frame_end=frame_end,
 )
 
 p = pv.Plotter(
@@ -149,6 +162,7 @@ p = pv.Plotter(
     window_size=[2000, 1000])
 
 # Window 1 - Ground Truth
+p.subplot(0, 0)
 p.show_grid(
     all_edges=True,
     show_xlabels=False,

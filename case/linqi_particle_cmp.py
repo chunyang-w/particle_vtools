@@ -39,58 +39,34 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-clim = [0, 0.5]
+clim = [0, 7]
 
 save_fig = args.save_fig
 move_camera = args.move_camera
 frame_start = args.frame_start
-frames_end = args.frame_end
+frame_end = args.frame_end
 show_clip_panel = args.show_clip_panel
 down_sample_factor = args.down_sample_factor
 
 
-particle_pred_df_path = "/Users/chunyang/Downloads/test.csv"  # noqa
-particle_ground_df_path = "/Users/chunyang/Downloads/test.csv"  # noqa
+particle_pred_df_path = "/Users/chunyang/Downloads/all_frames_UPT.csv"  # noqa
+particle_ground_df_path = "/Users/chunyang/Downloads/sinteredGlass_unsmoothed_velocityPoints.csv"  # noqa
 
 if __name__ == "__main__":
-    # fluid_slicer = (slice(None, -50), slice(50, -50), slice(50, -50))
-    # shift = np.array([0, 0, -450]).reshape(-1, 3)
-    # scale = 2
-    # rock_surface = PoreStructure_CT(
-    #     pore_tif_path,  # noqa
-    #     scale=scale,
-    #     down_sample_factor=down_sample_factor,
-    #     permute_axes=(2, 1, 0))
-    # rock_surface.tif_data = rock_surface.tif_data[230:, :, :]
-
-    # # Load the oil surface
-    # ct_files = glob.glob(ct_files_path) # noqa
-    # ct_files = natsorted(ct_files)
-    # ct_files = ct_files[85:106]
-
-    # oil_iterator = FluidIterator_CT(
-    #     "oil",
-    #     ct_files,
-    #     threshold=1,
-    #     scale=scale,
-    #     permute_axes=(2, 1, 0),
-    #     down_sample_factor=down_sample_factor,
-    #     # slicer=fluid_slicer,
-    #     )
     # Particle data
     particle_iterator_pred = ParticleIterator_DF(
         "particle",
         particle_pred_df_path,
         frame_key='frame',
-        x_key='x_pred',
-        y_key='y_pred',
-        z_key='z_pred',
-        vx_key='vx_pred',
-        vy_key='vy_pred',
-        vz_key='vz_pred',
-        # frame_start=86,
+        x_key='x',
+        y_key='y',
+        z_key='z',
+        vx_key='vx',
+        vy_key='vy',
+        vz_key='vz',
+        frame_start=frame_start,
+        frame_end=frame_end,
     )
-
     particle_iterator_ground = ParticleIterator_DF(
         "particle",
         particle_ground_df_path,
@@ -101,8 +77,15 @@ if __name__ == "__main__":
         vx_key='vx',
         vy_key='vy',
         vz_key='vz',
-        # frame_start=86,
+        frame_start=frame_start,
+        frame_end=frame_end,
     )
+
+    print("len(particle_iterator_pred):", len(particle_iterator_pred))
+    print("len(particle_iterator_ground):", len(particle_iterator_ground))
+
+    # print(particle_iterator_pred.get_particle(49))
+    print("here")
 
     p = pv.Plotter(
         title="Particle Prediction vs Ground Truth",
@@ -115,7 +98,7 @@ if __name__ == "__main__":
         # fluid_iterators=[oil_iterator],
         velocity_iterators=[particle_iterator_pred],
         # pore_structure=rock_surface,
-        num_frames=20,
+        num_frames=frame_end - frame_start,
         plotter=p,
         clip_panel=show_clip_panel,
         clim=clim,
@@ -125,7 +108,7 @@ if __name__ == "__main__":
         # fluid_iterators=[oil_iterator],
         velocity_iterators=[particle_iterator_ground],
         # pore_structure=rock_surface,
-        num_frames=20,
+        num_frames=frame_end - frame_start,
         plotter=p,
         clip_panel=show_clip_panel,
         clim=clim,
@@ -133,7 +116,7 @@ if __name__ == "__main__":
 
     def update_duo_view(frame_idx):
         p.subplot(0, 0)
-        # explorer_ground.update_scene3d(frame_idx)
+        explorer_ground.update_scene3d(frame_idx)
         p.subplot(0, 1)
         explorer_pred.update_scene3d(frame_idx)
 
@@ -145,8 +128,8 @@ if __name__ == "__main__":
         show_zlabels=False,
     )
     p.add_text("Ground Truth", font_size=20)
+    explorer_ground.set_scene3d(frame_start)
 
-    # explorer_ground.set_scene3d(frame_start)
     p.subplot(0, 1)
     p.show_grid(
         all_edges=True,
@@ -154,9 +137,9 @@ if __name__ == "__main__":
         show_ylabels=False,
         show_zlabels=False,
     )
-
     p.add_text("Prediction", font_size=20)
     explorer_pred.set_scene3d(frame_start)
+
     p.link_views()
 
     p.camera_position = "yz"
@@ -166,8 +149,8 @@ if __name__ == "__main__":
     if not save_fig:
         p.add_slider_widget(
             update_duo_view,
-            [frame_start, frames_end],
-            value=40,
+            [frame_start, frame_end],
+            value=frame_start,
             title='Frame',
         )
         p.show()
@@ -177,7 +160,7 @@ if __name__ == "__main__":
         text_actor = p.add_text(
             f"Frame: {frame_start}", position="upper_right", font_size=20)
         p.camera.zoom(1.2)
-        for i in range(frame_start, frames_end):
+        for i in range(frame_start, frame_end):
             p.remove_actor(text_actor)
             text_actor = p.add_text(
                 f"Frame: {i}", position="upper_right", font_size=20)

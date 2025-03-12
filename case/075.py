@@ -24,14 +24,14 @@ down_sample_factor = 8
 clim = [0, 10]
 arrow_lim = [0.5, 5]
 
+
 # # Change the paths to fit your data location
 pore_tif_path = "../data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left7_compressed.tif"  # noqa
-# ct_files_path = "../data/CombinedResults/Segmentations/075_segmented_tifs/*"  # noqa
-# particle_df_path = "../data/CombinedResults/Velocity-TSR6_TM1_TML20/075_RobuGlass3_drainage_348nl_min_run6_velocityPoints_surface_masked.csv"  # noqa
-
 # pore_tif_path = "../data/CombinedResults/Segmentations/074_segmented_tifs/seg_frame0.tif"  # noqa
-ct_files_path = "../data/Segmentations/074_segmented_tifs/*"  # noqa
-particle_df_path = "../data/Velocity/074_RobuGlass3_drainage_348nl_min_run6_velocityPoints_surface_masked.csv"  # noqa
+ct_files_path = "../data/Segmentations/075_segmented_tifs/*"  # noqa
+particle_df_path = "../data/Velocity/075_RobuGlass3_drainage_348nl_min_run7_velocityPoints_surface_masked.csv"  # noqa
+
+
 
 if __name__ == "__main__":
     fluid_slicer = (slice(0, None), slice(0, None), slice(0, None))

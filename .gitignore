@@ -4,3 +4,5 @@ demo/073_pred.py
 */__pycache__/*
 
 compare*
+
+*.DS_Store

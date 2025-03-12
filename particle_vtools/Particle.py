@@ -17,11 +17,9 @@ from abc import ABC, abstractmethod
 class ParticleIterator(ABC):
     def __init__(self,
                  name,
-                 frame_start=0,
                  arrow_lim=(0.1, 3),
                  ):
         self.name = name
-        self.frame_start = frame_start
         self.arrow_min, self.arrow_max = arrow_lim
 
     def compute_velocity_magnitudes(self, velocities):
@@ -98,7 +96,6 @@ class ParticleIterator(ABC):
         """
         Supports indexing and slicing.
         """
-        index = self.frame_start + index
         return self.get_glyph(index)
 
     def __iter__(self):
@@ -133,10 +130,13 @@ class ParticleIterator_DF(ParticleIterator):
                  vz_key='vz',
                  shift_array=np.array([0, 0, 0]).reshape(-1, 3),
                  frame_start=0,
+                 frame_end=10000,
                  **kwargs
                  ):
-        super().__init__(name, frame_start, **kwargs)
+        super().__init__(name, **kwargs)
         self.df = pd.read_csv(df_path)
+        self.df = self.df[(self.df[frame_key] >= frame_start) &
+                          (self.df[frame_key] <= frame_end)]
         self.frame_key = frame_key
         self.shift = shift_array
         self.x_key = x_key
