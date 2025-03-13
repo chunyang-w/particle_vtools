@@ -22,9 +22,9 @@ clim = [0, 10]
 arrow_lim = [0.5, 5]
 
 # Change the paths to fit your data location
-pore_tif_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/073_segmented_00000.tif"  # noqa
-ct_files_path = "../data/072_combined_results/registered_cleanedAvizo/*"  # noqa
-particle_df_path = "../data/072_combined_results/trajectories/velocity_points_newversion_bp1_tsr6tm1tml20_surface_masked.csv"  # noqa
+pore_tif_path = "../data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left7_compressed.tif"  # noqa
+ct_files_path = "../data/Segmentations/072/*"  # noqa
+particle_df_path = "../data/Velocity/072_velocity_points_newversion_bp1_tsr6tm1tml20_surface_masked.csv"  # noqa
 
 if __name__ == "__main__":
     # The slicer is used to crop the fluid surface - this is optional
@@ -34,9 +34,9 @@ if __name__ == "__main__":
 
     rock_surface = PoreStructure_CT(
         pore_tif_path,  # noqa
-        scale=2,        # scale the image by two - the input image is too large this is optional  # noqa
+        scale=1,        # scale the image by two - the input image is too large this is optional  # noqa
         threshold=0,    # threshold used in marching cube algo to generate the surface  # noqa
-        down_sample_factor=down_sample_factor, # down sample the image by 8 - this is optional  # noqa
+        down_sample_factor=down_sample_factor*2, # down sample the image by 8 - this is optional  # noqa
         permute_axes=(2, 1, 0))  # permute the axes - this is optional  # noqa
     # delete this line if you do not want to crop the rock surface
     rock_surface.tif_data = rock_surface.tif_data[230:, :, :]
@@ -45,10 +45,12 @@ if __name__ == "__main__":
     ct_files = glob.glob(ct_files_path) # noqa
     ct_files = natsorted(ct_files)
     oil_iterator = FluidIterator_CT(
-        "oil", ct_files, threshold=0,
+        "oil", ct_files, threshold=255,
         permute_axes=(2, 1, 0),
         down_sample_factor=down_sample_factor,
-        slicer=fluid_slicer)
+        slicer=fluid_slicer
+        )
+
     # Particle data
     particle_df_path = particle_df_path # noqa
     paricle_iterator = ParticleIterator_DF(

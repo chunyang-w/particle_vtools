@@ -8,9 +8,12 @@ def tif_2_geo(tif_file, threshold=0, down_sample_factor=4):
     """
     Extract the geometry of the surface from a tif data.
     """
-    img = tif_file
+    # pad_width = 1
+    img = tif_file == threshold
+    # img = np.pad(img, pad_width=pad_width, mode='constant', constant_values=1)
     img = img[::down_sample_factor, ::down_sample_factor, ::down_sample_factor]
-    verts, faces, _, _ = measure.marching_cubes(img, level=threshold)
+    verts, faces, _, _ = measure.marching_cubes(img, level=0.5)
+    # verts = verts - pad_width
     verts = verts * down_sample_factor
     return verts, faces
 

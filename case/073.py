@@ -33,11 +33,10 @@ particle_df_path = "../data/Velocity/073_RobuGlass3_drainage_174nl_min_run5_velo
 if __name__ == "__main__":
     fluid_slicer = (slice(0, None), slice(0, None), slice(0, None))
     shift = np.array([50, 50, 0]).reshape(-1, 3)
-
     rock_surface = PoreStructure_CT(
         pore_tif_path,  # noqa
         scale=1,
-        threshold=0,
+        threshold=255,
         down_sample_factor=down_sample_factor,
         permute_axes=(2, 1, 0))
 
@@ -45,7 +44,7 @@ if __name__ == "__main__":
     ct_files = glob.glob(ct_files_path) # noqa
     ct_files = natsorted(ct_files)
     oil_iterator = FluidIterator_CT(
-        "oil", ct_files, threshold=0,
+        "oil", ct_files, threshold=1,
         permute_axes=(2, 1, 0),
         down_sample_factor=down_sample_factor,
         slicer=fluid_slicer)
