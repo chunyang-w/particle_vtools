@@ -22,7 +22,8 @@ clim = [0, 10]
 arrow_lim = [0.5, 5]
 
 # Change the paths to fit your data location
-pore_tif_path = "../data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left7_compressed.tif"  # noqa
+# pore_tif_path = "../data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left7_compressed.tif"  # noqa
+pore_tif_path = "../data/Segmentations/073_downsampledx2/073_segmented_00000.tif"
 ct_files_path = "../data/Segmentations/072/*"  # noqa
 particle_df_path = "../data/Velocity/072_velocity_points_newversion_bp1_tsr6tm1tml20_surface_masked.csv"  # noqa
 
@@ -34,7 +35,7 @@ if __name__ == "__main__":
 
     rock_surface = PoreStructure_CT(
         pore_tif_path,  # noqa
-        scale=1,        # scale the image by two - the input image is too large this is optional  # noqa
+        scale=2,        # scale the image by two - the input image is too large this is optional  # noqa
         threshold=0,    # threshold used in marching cube algo to generate the surface  # noqa
         down_sample_factor=down_sample_factor*2, # down sample the image by 8 - this is optional  # noqa
         permute_axes=(2, 1, 0))  # permute the axes - this is optional  # noqa
