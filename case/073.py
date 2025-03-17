@@ -36,7 +36,7 @@ if __name__ == "__main__":
     rock_surface = PoreStructure_CT(
         pore_tif_path,  # noqa
         scale=1,
-        threshold=255,
+        threshold=0,
         down_sample_factor=down_sample_factor,
         permute_axes=(2, 1, 0))
 
