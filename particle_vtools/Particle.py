@@ -18,8 +18,10 @@ class ParticleIterator(ABC):
     def __init__(self,
                  name,
                  arrow_lim=(0.1, 3),
+                 scale_arrow=15,
                  ):
         self.name = name
+        self.scale_arrow = scale_arrow
         self.arrow_min, self.arrow_max = arrow_lim
 
     def compute_velocity_magnitudes(self, velocities):
@@ -80,7 +82,7 @@ class ParticleIterator(ABC):
             orient='velocity',
             scale='arrowScale',
             color_mode='scalar',
-            factor=15,
+            factor=self.scale_arrow,
             geom=arrow)
         glyphs.set_active_scalars("mags")
         return glyphs
@@ -131,12 +133,15 @@ class ParticleIterator_DF(ParticleIterator):
                  shift_array=np.array([0, 0, 0]).reshape(-1, 3),
                  frame_start=0,
                  frame_end=10000,
+                 particle_idx=None,
                  **kwargs
                  ):
         super().__init__(name, **kwargs)
         self.df = pd.read_csv(df_path)
         self.df = self.df[(self.df[frame_key] >= frame_start) &
                           (self.df[frame_key] <= frame_end)]
+        if particle_idx is not None:
+            self.df = self.df[self.df['particle'].isin(particle_idx)]
         self.frame_key = frame_key
         self.shift = shift_array
         self.x_key = x_key

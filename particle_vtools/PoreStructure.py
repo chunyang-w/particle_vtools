@@ -11,7 +11,6 @@ The entities are:
 """
 from abc import ABC, abstractmethod
 from skimage import io
-from sklearn.preprocessing import normalize
 from .utils import tif_2_geo, geo_2_mesh
 
 
