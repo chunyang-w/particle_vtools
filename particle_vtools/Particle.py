@@ -17,12 +17,14 @@ from abc import ABC, abstractmethod
 class ParticleIterator(ABC):
     def __init__(self,
                  name,
-                 arrow_lim=(0.1, 3),
-                 scale_arrow=15,
+                 arrow_lim=(0.21, 3.2),
+                 scale_arrow=13,
+                 frame_offset=0,
                  ):
         self.name = name
         self.scale_arrow = scale_arrow
         self.arrow_min, self.arrow_max = arrow_lim
+        self.frame_offset = frame_offset
 
     def compute_velocity_magnitudes(self, velocities):
         """
@@ -35,7 +37,6 @@ class ParticleIterator(ABC):
     def map_magnitudes_to_size(self, magnitudes, low, high):
         """
         Map magnitudes [min, max] -> [low, high] (linear mapping/clamping)
-        If you just want to clamp, you can use np.clip directly.
         """
         # First find global min & max from your data or from magnitudes
         mag_min = magnitudes.min()
@@ -77,7 +78,19 @@ class ParticleIterator(ABC):
 
         points.set_active_scalars("mags")
         print(points.active_scalars_name)
-        arrow = pv.Arrow()
+        arrow = pv.Arrow(
+            start=(0, 0, 0),
+            direction=(1, 0, 0),
+            tip_radius=0.2,
+            tip_length=0.4,
+            shaft_radius=0.1,
+        )
+        bounds = arrow.bounds  # (xmin, xmax, ymin, ymax, zmin, zmax)
+        # print("Arrow bounds:", bounds)
+        # The arrow tip is usually near the upper bound (xmax). Move that to x=0.
+        xmax = bounds[1]
+        arrow = arrow.translate((-xmax, 0, 0))
+
         glyphs = points.glyph(
             orient='velocity',
             scale='arrowScale',
@@ -98,6 +111,7 @@ class ParticleIterator(ABC):
         """
         Supports indexing and slicing.
         """
+        index = index + self.frame_offset
         return self.get_glyph(index)
 
     def __iter__(self):

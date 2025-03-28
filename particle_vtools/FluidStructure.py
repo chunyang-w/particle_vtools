@@ -7,14 +7,19 @@ This file defines the entities that are used in the vtools package.
 The entities are:
 - FluidIterator
 """
+import numpy as np
 from abc import ABC, abstractmethod
 from skimage import io
 from .utils import tif_2_geo, geo_2_mesh
 
 
 class FluidIterator(ABC):
-    def __init__(self, name):
+    def __init__(self,
+                 name,
+                 frame_offset=0,
+                 ):
         self.name = name
+        self.frame_offset = frame_offset
 
     @abstractmethod
     def get_geo(self, index):
@@ -43,6 +48,7 @@ class FluidIterator(ABC):
         """
         Supports indexing and slicing.
         """
+        index = index + self.frame_offset
         return self.get_surface(index)
 
     def __iter__(self):
@@ -88,6 +94,58 @@ class FluidIterator_CT(FluidIterator):
     def get_geo(self, index):
         # Read the TIFF file
         tif_data = io.imread(self.fluid_files[index])
+        if self.slicer:
+            tif_data = tif_data[self.slicer]
+        # Convert the TIFF data to geometry (vertices and faces)
+        verts, faces = tif_2_geo(
+            tif_data,
+            threshold=self.threshold,
+            down_sample_factor=self.down_sample_factor,
+        )
+        if self.scale:
+            verts *= self.scale
+        if self.permute_axes:
+            verts = verts[:, self.permute_axes]
+        return verts, faces
+
+    def get_surface(self, index):
+        verts, faces = self.get_geo(index)
+        # Convert the geometry into a mesh
+        mesh_surface = geo_2_mesh(
+            verts, faces,
+            smooth_iter=self.smooth_iter,
+            smooth_factor=self.smooth_factor)
+        return mesh_surface
+
+    def __len__(self):
+        return len(self.fluid_files)
+
+
+class FluidIterator_Numpy(FluidIterator):
+    def __init__(self,
+                 name,
+                 fluid_file_path,
+                 threshold=1,
+                 down_sample_factor=4,
+                 smooth_iter=10,
+                 smooth_factor=0.5,
+                 scale=None,
+                 permute_axes=None,
+                 slicer=None,
+                 **kwargs):
+        super().__init__(name, **kwargs)
+        self.fluid_file = np.load(fluid_file_path)
+        self.threshold = threshold
+        self.down_sample_factor = down_sample_factor
+        self.smooth_iter = smooth_iter
+        self.smooth_factor = smooth_factor
+        self.scale = scale
+        self.permute_axes = permute_axes
+        self.slicer = slicer
+
+    def get_geo(self, index):
+        # Read the TIFF file
+        tif_data = self.fluid_file[index]
         if self.slicer:
             tif_data = tif_data[self.slicer]
         # Convert the TIFF data to geometry (vertices and faces)

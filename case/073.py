@@ -22,7 +22,7 @@ clip_panel = True
 
 down_sample_factor = 8
 clim = [0, 10]
-arrow_lim = [0.5, 5]
+arrow_lim = [0.25, 5]
 
 # # Change the paths to fit your data location
 pore_tif_path = "../data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left7_compressed.tif"  # noqa
@@ -55,38 +55,37 @@ if __name__ == "__main__":
         particle_df_path,
         shift_array=shift,
         arrow_lim=arrow_lim,
+        scale_arrow=15,
         )
 
     # Init explorer
     explorer = Explorer3D(
-        [oil_iterator],
-        [paricle_iterator],
-        rock_surface,
+        fluid_iterators=[oil_iterator],
+        velocity_iterators=[paricle_iterator],
+        # pore_structure=rock_surface,
         clim=clim,
-        clip_panel=clip_panel,
+        # clip_panel=clip_panel,
+        clip_panel=True,
         num_frames=len(oil_iterator),
+        surface_transparency=0.01,
         )
-
-    # set time slider
-    explorer.plotter.show_grid(
-        all_edges=True,
-        # show_xlabels=False,
-        # show_ylabels=False,
-        # show_zlabels=False,
-    )
 
 
 if not save_fig:
     explorer.set_scene3d(0)
     explorer.set_time_slider()
+    p = explorer.plotter
+    p.camera_position = "yz"
+    p.camera.azimuth = 0
+    p.camera.elevation = 15
     explorer.explore()
 elif save_fig:
     move_camera = True
     num_frames = [i for i in range(45, 65, 1)]
-    p = explorer.plotter
     explorer.set_scene3d(num_frames[0])
+    p = explorer.plotter
     p.camera_position = "yz"
-    p.camera.azimuth = 130
+    p.camera.azimuth = 0
     p.camera.elevation = 15
     p.camera.zoom(2)
     p.open_gif("compare_flow_direction.gif", fps=2)

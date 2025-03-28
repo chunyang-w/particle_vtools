@@ -25,10 +25,11 @@ class Explorer3D:
         pore_structure=None,
         num_frames=100,
         bg_color="white",
-        surface_transparency=0.05,
+        surface_transparency=0.023,
         particle_cmap="jet",
         plotter=None,
         clip_panel=True,
+        show_colorbar=True,
         clim=[0, 7],
     ):
         self.pore_structure = pore_structure
@@ -40,6 +41,7 @@ class Explorer3D:
         self.plotter = plotter
         self.clip_panel = clip_panel
         self.clim = clim
+        self.show_colorbar = show_colorbar
 
         self.setup(bg_color)
         self.set_light()
@@ -68,6 +70,8 @@ class Explorer3D:
                 self.fluid_surfaces.append(fluid_mesh)
                 self.plotter.add_mesh(
                     fluid_mesh,
+                    style='wireframe',
+                    line_width=0.5,
                     color="blue",
                     pbr=True,
                     metallic=0.1,
@@ -78,8 +82,9 @@ class Explorer3D:
                     self.plotter.add_mesh_clip_plane(
                         fluid_mesh,
                         normal='-z',
+                        outline_opacity=False,
                         origin=fluid_mesh.center,
-                        color="blue", outline_opacity=0.1)
+                        color="blue")
 
         # set particle velocity arrow
         if self.velocity_iterators is not None:
@@ -94,15 +99,18 @@ class Explorer3D:
                         'title': "Velocity Magnitude"
                         },
                 )
+                if self.velocity_iterators is not None:
+                    self.plotter.remove_scalar_bar()
                 self.velocity_arrows.append(actor)
 
         # set pore structure
         if self.pore_structure is not None:
-            pore_mesh = self.pore_structure.get_surface()
+            self.pore_mesh = self.pore_structure.get_surface()
             if self.clip_panel:
                 self.plotter.add_mesh_clip_plane(
-                    pore_mesh,
-                    normal='x', origin=pore_mesh.center,
+                    self.pore_mesh,
+                    outline_opacity=False,
+                    normal='x', origin=self.pore_mesh.center,
                     color="grey")
 
     def update_scene3d(self, frame_idx):
@@ -127,9 +135,11 @@ class Explorer3D:
                     cmap=self.particle_cmap,
                     clim=self.clim,
                     scalar_bar_args={
-                        'title': "Velocity Magnitude"
+                        'title': "Velocity Magnitude",
                         },
                     )
+                if self.velocity_iterators is not None:
+                    self.plotter.remove_scalar_bar()
 
     def set_time_slider(self, start=0):
         start = start

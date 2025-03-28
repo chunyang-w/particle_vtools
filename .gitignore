@@ -6,3 +6,7 @@ demo/073_pred.py
 compare*
 
 *.DS_Store
+
+*.html
+
+*.gif
