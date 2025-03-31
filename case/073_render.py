@@ -20,8 +20,8 @@ from particle_vtools.Particle import ParticleIterator_DF
 num_frames = [i for i in range(45, 180, 1)]
 
 save_fig = False
-save_fig = True
-clip_panel = False
+# save_fig = True
+clip_panel = True
 # clip_panel = True
 
 down_sample_factor = 5
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         )
 
     p = explorer.plotter
-    # p.show_bounds(location='all')
+    p.show_bounds(location='all')
     explorer.set_scene3d(num_frames[0])
     clip_start = 0
 
@@ -112,8 +112,8 @@ if __name__ == "__main__":
         return_clipped=True,
         value=0)
 
-    p.add_mesh(fluid_mesh_clip, color="blue")
-    p.add_mesh(pore_mesh_clip, color="grey")
+    # p.add_mesh(fluid_mesh_clip, color="blue")
+    # p.add_mesh(pore_mesh_clip, color="grey")
 
     # init camera
     p.camera_position = "yz"
