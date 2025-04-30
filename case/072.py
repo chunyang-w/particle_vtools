@@ -19,7 +19,7 @@ from particle_vtools.Particle import ParticleIterator_DF
 
 down_sample_factor = 3
 clim = [0, 10]
-arrow_lim = [0.2, 5]
+arrow_lim = [0.8, 5]
 
 # Change the paths to fit your data location
 # pore_tif_path = "../data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left7_compressed.tif"  # noqa

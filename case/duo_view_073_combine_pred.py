@@ -25,6 +25,8 @@ from particle_vtools.FluidStructure import (  # noqa
 from particle_vtools.Particle import ParticleIterator_DF
 import argparse
 
+pv.global_theme.transparent_background = True
+
 # Parse command line arguments
 parser = argparse.ArgumentParser(
     description="Particle Prediction vs Ground Truth Visualization")
@@ -51,6 +53,8 @@ frame_start = 150
 frame_end = 180
 frame_offset = -1*frame_start
 shift_array = [50, 50, 0]
+arrow_lim = [0.5, 2]
+surface_transparency = 0.005
 
 # Change the paths to fit your data location
 pore_tif_path = "/Users/chunyang/projects/particle/data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left7_compressed.tif"  # noqa
@@ -109,10 +113,11 @@ if __name__ == "__main__":
         vz_key='vz',
         frame_start=frame_start,
         frame_end=frame_end,
-        scale_arrow=30,
+        scale_arrow=15,
         shift_array=shift_array,
-        particle_idx=particle_idx,
+        # particle_idx=particle_idx,
         frame_offset=0,
+        arrow_lim=arrow_lim,
     )
 
     particle_iterator_ground = ParticleIterator_DF(
@@ -127,10 +132,11 @@ if __name__ == "__main__":
         vz_key='vz',
         frame_start=frame_start,
         frame_end=frame_end,
-        scale_arrow=30,
+        scale_arrow=15,
         shift_array=shift_array,
-        particle_idx=particle_idx,
+        # particle_idx=particle_idx,
         frame_offset=0,
+        arrow_lim=arrow_lim,
     )
 
     p = pv.Plotter(
@@ -147,6 +153,7 @@ if __name__ == "__main__":
         num_frames=30,
         plotter=p,
         clip_panel=show_clip_panel,
+        surface_transparency=surface_transparency,
         )
 
     explorer_ground = Explorer3D(
@@ -156,6 +163,7 @@ if __name__ == "__main__":
         num_frames=30,
         plotter=p,
         clip_panel=show_clip_panel,
+        surface_transparency=surface_transparency,
         )
 
     def update_duo_view(frame_idx):
@@ -188,9 +196,13 @@ if __name__ == "__main__":
 
     p.camera_position = "yz"
     # Plus a positive azimuth is to rotate the camera clockwise
-    p.camera.azimuth = 20
-    p.camera.elevation = 15
-    p.camera.zoom(1.8)
+    # p.camera.azimuth = 20
+    # p.camera.elevation = 15
+    # p.camera.zoom(1.8)
+
+    p.camera.azimuth = -140
+    p.camera.elevation = 5
+    p.camera.zoom(1.5)
 
     if not save_fig:
         p.add_slider_widget(
@@ -202,7 +214,10 @@ if __name__ == "__main__":
         p.show()
 
     elif save_fig:
-        p.open_gif("73_pred_combine.gif", fps=8)
+        p.open_gif("73_pred_combine.gif", fps=10)
+
+        p.set_background(None)
+
         text_actor = p.add_text(
             "Frame: 0", position="upper_right", font_size=20)
         for i in range(frame_start, frame_end):

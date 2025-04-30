@@ -13,20 +13,24 @@ from particle_vtools.Explorer3D import Explorer3D
 from particle_vtools.PoreStructure import PoreStructure_CT
 from particle_vtools.FluidStructure import FluidIterator_CT
 from particle_vtools.Particle import ParticleIterator_DF
+import pyvista as pv
+pv.global_theme.transparent_background = True
 
 # Scaling factor - larger factor means smaller image
 # a larger factore will accelerate the rendering
 
+# num_frames = [i for i in range(150, 180, 1)]
+
 num_frames = [i for i in range(45, 180, 1)]
 
 save_fig = False
-# save_fig = True
+save_fig = True
 clip_panel = True
-# clip_panel = True
+clip_panel = False
 
 down_sample_factor = 5
 clim = [0, 10]
-arrow_lim = [0.25, 5]
+arrow_lim = [0.5, 2.5]
 
 anim_frame = 100
 split_gif = True
@@ -94,7 +98,7 @@ if __name__ == "__main__":
         )
 
     p = explorer.plotter
-    p.show_bounds(location='all')
+    # p.show_bounds(location='all')
     explorer.set_scene3d(num_frames[0])
     clip_start = 0
 
@@ -112,8 +116,8 @@ if __name__ == "__main__":
         return_clipped=True,
         value=0)
 
-    # p.add_mesh(fluid_mesh_clip, color="blue")
-    # p.add_mesh(pore_mesh_clip, color="grey")
+    p.add_mesh(fluid_mesh_clip, color="blue")
+    p.add_mesh(pore_mesh_clip, color="grey")
 
     # init camera
     p.camera_position = "yz"
@@ -192,8 +196,10 @@ if __name__ == "__main__":
 
         if split_gif:
             p.open_gif("render/073_render_03.gif", fps=fps)
+
         # move camera
-        num_moving_frames = 2*len(num_frames)
+        slow_factor = 4
+        num_moving_frames = slow_factor*len(num_frames)
         for i in range(num_moving_frames):
             move_angle = 12
             zoom_factor = 1.6
@@ -204,13 +210,13 @@ if __name__ == "__main__":
             p.write_frame()
             p.remove_actor(text_actor)
             text_actor = p.add_text(
-                f"Frame: {num_frames[i//2]}", position="upper_right",
+                f"Frame: {num_frames[i//slow_factor]}", position="upper_right",
                 font_size=20)
             p.camera.azimuth = p.camera.azimuth + delta_angle
             p.camera.zoom(1 + delta_zoom)
             p.camera.elevation = p.camera.elevation + delta_elevation
-            if i % 2 == 0:
-                explorer.update_scene3d(num_frames[i//2])
+            if i % slow_factor == 0:
+                explorer.update_scene3d(num_frames[i//slow_factor])
 
         num_rest_frames = 50
         for i in range(num_rest_frames):

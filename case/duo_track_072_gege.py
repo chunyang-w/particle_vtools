@@ -42,9 +42,13 @@ opacity = 0.5
 frame_start = 110
 frame_end = 139
 
+frame_start = 161
+frame_end = frame_start + 30
+
 particle_offset = [50, 50, -460]
 
-particle_pred_df_path = "/Users/chunyang/Downloads/072_autoregressive_noise5_predictions.csv"  # noqa
+# particle_pred_df_path = "/Users/chunyang/Downloads/072_autoregressive_noise5_predictions.csv"  # noqa
+particle_pred_df_path = "/Users/chunyang/Downloads/rollout_t161.csv"
 particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_smooth/072_final.csv"  # noqa
 ct_files_path = "/Users/chunyang/projects/particle/data/Segmentations/072/*"  # noqa
 

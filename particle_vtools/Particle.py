@@ -18,7 +18,7 @@ class ParticleIterator(ABC):
     def __init__(self,
                  name,
                  arrow_lim=(0.21, 3.2),
-                 scale_arrow=13,
+                 scale_arrow=5,
                  frame_offset=0,
                  ):
         self.name = name
@@ -34,21 +34,32 @@ class ParticleIterator(ABC):
         """
         return np.linalg.norm(velocities, axis=1)
 
+    # def map_magnitudes_to_size(self, magnitudes, low, high):
+    #     """
+    #     Map magnitudes [min, max] -> [low, high] (linear mapping/clamping)
+    #     """
+    #     # First find global min & max from your data or from magnitudes
+    #     mag_min = magnitudes.min()
+    #     mag_max = magnitudes.max()
+    #     # Avoid division by zero
+    #     denom = max(mag_max - mag_min, 1e-12)
+
+    #     # Linear mapping
+    #     scaled = low + (magnitudes - mag_min) * (high - low) / denom
+
+    #     # Clamp to [low, high] just in case
+    #     scaled = np.clip(scaled, low, high)
+    #     return scaled
+
     def map_magnitudes_to_size(self, magnitudes, low, high):
         """
-        Map magnitudes [min, max] -> [low, high] (linear mapping/clamping)
+        Apply a lower bound threshold to magnitudes.
+
+        Any value below `low` is set to `low`. Values above are preserved,
+        but capped at `high` for safety.
         """
-        # First find global min & max from your data or from magnitudes
-        mag_min = magnitudes.min()
-        mag_max = magnitudes.max()
-        # Avoid division by zero
-        denom = max(mag_max - mag_min, 1e-12)
-
-        # Linear mapping
-        scaled = low + (magnitudes - mag_min) * (high - low) / denom
-
-        # Clamp to [low, high] just in case
-        scaled = np.clip(scaled, low, high)
+        # Clamp values to [low, high]
+        scaled = np.clip(magnitudes, low, high)
         return scaled
 
     @abstractmethod

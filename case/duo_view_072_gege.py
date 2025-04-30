@@ -51,7 +51,7 @@ shift_array = [50, 50, -460]
 
 # Change the paths to fit your data location
 # pore_tif_path = "/Users/chunyang/projects/particle/data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left7_compressed.tif"  # noqa
-particle_pred_df_path = "/Users/chunyang/Downloads/072_autoregressive_noise5_predictions.csv"  # noqa
+particle_pred_df_path = "/Users/chunyang/Downloads/rollout_t13.csv"  # noqa
 particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_smooth/072_final.csv"  # noqa
 ct_files_path = "/Users/chunyang/projects/particle/data/Segmentations/072/*"  # noqa
 

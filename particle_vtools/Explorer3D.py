@@ -138,8 +138,8 @@ class Explorer3D:
                         'title': "Velocity Magnitude",
                         },
                     )
-                if self.velocity_iterators is not None:
-                    self.plotter.remove_scalar_bar()
+                # if self.velocity_iterators is not None:
+                #     self.plotter.remove_scalar_bar()
 
     def set_time_slider(self, start=0):
         start = start
