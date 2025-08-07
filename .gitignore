@@ -12,3 +12,5 @@ compare*
 *.gif
 
 arch/*
+
+*.npy
