@@ -95,7 +95,7 @@ if __name__ == "__main__":
         vz_key='vz',
         frame_start=frame_start,
         frame_end=frame_end,
-        scale_arrow=30,
+        scale_arrow=15,
         shift_array=shift_array,
         particle_idx=particle_idx,
     )
@@ -112,7 +112,8 @@ if __name__ == "__main__":
         vz_key='vz',
         frame_start=frame_start,
         frame_end=frame_end,
-        scale_arrow=30,
+        scale_arrow=15,
+        arrow_lim=(0.3, 3.2),
         shift_array=shift_array,
         particle_idx=particle_idx,
     )
@@ -128,9 +129,10 @@ if __name__ == "__main__":
         fluid_iterators=[oil_iterator],
         velocity_iterators=[particle_iterator_pred],
         pore_structure=rock_surface,
-        num_frames=30,
+        num_frames=30, 
         plotter=p,
         clip_panel=show_clip_panel,
+        surface_transparency=0.07,
         )
 
     explorer_ground = Explorer3D(
@@ -140,6 +142,7 @@ if __name__ == "__main__":
         num_frames=30,
         plotter=p,
         clip_panel=show_clip_panel,
+        surface_transparency=0.07,
         )
 
     def update_duo_view(frame_idx):
@@ -149,22 +152,22 @@ if __name__ == "__main__":
         explorer_pred.update_scene3d(frame_idx)
 
     p.subplot(0, 0)
-    p.show_grid(
-        all_edges=True,
-        show_xlabels=False,
-        show_ylabels=False,
-        show_zlabels=False,
-    )
+    # p.show_grid(
+    #     all_edges=True,
+    #     show_xlabels=False,
+    #     show_ylabels=False,
+    #     show_zlabels=False,
+    # )
     p.add_text("Ground Truth", font_size=20)
 
     explorer_ground.set_scene3d(frame_start)
     p.subplot(0, 1)
-    p.show_grid(
-        all_edges=True,
-        show_xlabels=False,
-        show_ylabels=False,
-        show_zlabels=False,
-    )
+    # p.show_grid(
+    #     all_edges=True,
+    #     show_xlabels=False,
+    #     show_ylabels=False,
+    #     show_zlabels=False,
+    # )
 
     p.add_text("Prediction", font_size=20)
     explorer_pred.set_scene3d(frame_start)

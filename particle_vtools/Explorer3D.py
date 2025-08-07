@@ -71,7 +71,7 @@ class Explorer3D:
                 self.plotter.add_mesh(
                     fluid_mesh,
                     style='wireframe',
-                    line_width=0.5,
+                    line_width=0.9,
                     color="blue",
                     pbr=True,
                     metallic=0.1,

@@ -10,3 +10,5 @@ compare*
 *.html
 
 *.gif
+
+arch/*

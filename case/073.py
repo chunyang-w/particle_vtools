@@ -21,8 +21,8 @@ save_fig = False
 clip_panel = True
 
 down_sample_factor = 8
-clim = [0, 10]
-arrow_lim = [0.25, 5]
+clim = [0, 16]
+arrow_lim = [0.1, 3]
 
 # # Change the paths to fit your data location
 pore_tif_path = "../data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left7_compressed.tif"  # noqa
