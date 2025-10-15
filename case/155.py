@@ -25,10 +25,21 @@ clim = [0, 10]
 arrow_lim = [0.25, 3]
 
 # # Change the paths to fit your data location
+# Original data
 pore_tif_path = "../data/Ketton155Data/141_ketton3_segmented_inverted.tif"  # noqa
 # pore_tif_path = "../data/CombinedResults/Segmentations/074_segmented_tifs/seg_frame0.tif"  # noqa
 ct_files_path = "../data/Segmentations/155_segmented_cleaned/*"  # noqa
 particle_df_path = "../data/Velocity/155_Drain100x0p5s250nlmin_ft99p5_velocityPoints.csv"  # noqa
+
+# Filtered data
+# pore_tif_path = "../data/Ketton155Data/141_ketton3_segmented_inverted.tif"  # noqa
+# ct_files_path = "/Users/chunyang/projects/particle/data/Ketton155Data/155_segmented_cleaned_filtered/*"  # noqa
+# particle_df_path = "/Users/chunyang/projects/particle/data/Ketton155Data/155_Drain100x0p5s250nlmin_ft99p5_velocityPoints_surface_masked.csv"  # noqa
+
+# Filtered croped
+# pore_tif_path = "../data/Ketton155Data/141_ketton3_segmented_inverted.tif"  # noqa
+# ct_files_path = "/Users/chunyang/projects/particle/data/Ketton155Data/155_segmented_cleaned_filtered_cropped/*"  # noqa
+# particle_df_path = "/Users/chunyang/projects/particle/data/Ketton155Data/155_Drain100x0p5s250nlmin_ft99p5_velocityPoints_surface_masked.csv"  # noqa
 
 if __name__ == "__main__":
     fluid_slicer = (slice(0, None), slice(0, None), slice(0, None))

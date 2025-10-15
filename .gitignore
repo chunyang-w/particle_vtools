@@ -14,3 +14,16 @@ compare*
 arch/*
 
 *.npy
+
+out/*.png
+out/*.gif
+out/*.mp4
+out/*.mov
+out/*.avi
+out/*.webm
+out/*.webp
+out/*.jpg
+out/*.jpeg
+out/*.png
+out/*.gif
+out/*.pdf

@@ -23,7 +23,7 @@ from particle_vtools.FluidStructure import FluidIterator_CT
 # from particle_vtools.Particle import ParticleIterator_DF
 # import argparse
 
-save_fig = False
+save_fig = True
 num_frames = 100
 
 drop_percent = 0
@@ -45,16 +45,22 @@ particle_offset = [0, 0, -50]
 frame_start = 150
 frame_end = 180
 
+particle_max_height = 1180
+
+show_bar = False
+
 pore_tif_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/073_segmented_00000.tif"  # noqa
 
 # This is single modality prediction
 # particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180_partial_073_teston_073.csv"  # noqa
 
 # Cross modality prediction on 073, 150-180 frames
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (4).csv"  # noqa this is the good one
+# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (4).csv"  # noqa this is the good one
 # particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (5).csv"  # noqa no-reg
 # particle_pred_df_path = "/Users/chunyang/Downloads/73_t120-190.csv"  # noqa
 # particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (8).csv"  # just testing
+particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (9).csv"  # no-img-encoder pred
+# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (10).csv"  # test new rollout
 
 particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_smooth/073_final.csv"  # noqa
 ct_files_path = "/Users/chunyang/projects/particle/data/Segmentations/073_downsampledx2/*"  # noqa
@@ -105,6 +111,7 @@ def get_track(
     if particle_idx is not None:
         df = df[df[particle_key].isin(particle_idx)]
     df = df[(df[frame_key] >= frame_start) & (df[frame_key] <= frame_end)]
+    df = df[df[z_key] < particle_max_height]
 
     lines = []
     velocities = []
@@ -186,7 +193,7 @@ track_ground = get_track(
 p = pv.Plotter(
     title="Particle Prediction vs Ground Truth",
     shape=(1, 2),
-    window_size=[2000, 1000])
+    window_size=[2500, 1250])
 
 # Window 1 - Ground Truth
 # p.show_grid(
@@ -262,18 +269,24 @@ p.add_mesh(
 p.link_views()
 
 p.camera_position = "yz"
-p.camera.azimuth = -30
-p.camera.elevation = 15
+p.camera.azimuth = -120
+p.camera.elevation = 10
+p.camera.zoom(1.2)
 
 csv_base_name = particle_pred_df_path.split("/")[-1].split(".")[0]
 run_name = f"out/duo_track_{csv_base_name}"
+
+if show_bar:
+    pass
+else:
+    p.remove_scalar_bar()
 
 if not save_fig:
     p.show()
 
 elif save_fig:
     p.camera.azimuth = 0
-    p.camera.zoom(1.2)
+    
     p.export_html(f"{run_name}.html")
     p.open_gif(f"{run_name}.gif", fps=4)
     for i in range(num_frames):
