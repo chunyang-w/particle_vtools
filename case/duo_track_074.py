@@ -50,27 +50,18 @@ particle_max_height = 1180
 
 show_bar = False
 
-pore_tif_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/073_segmented_00000.tif"  # noqa
 
 # This is single modality prediction
 # particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180_partial_073_teston_073.csv"  # noqa
 
-# Cross modality prediction on 073, 150-180 frames
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (4).csv"  # noqa this is the good one
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (5).csv"  # noqa no-reg
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t120-190.csv"  # noqa
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (8).csv"  # just testing
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (9).csv"  # no-img-encoder pred
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (10).csv"  # test new rollout
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (12).csv"  # new stuff here - with out the offset, now on clearn dataset
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (13).csv"  # new trained nl4 nh32 global stats on 073-075, multipmodal
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (16).csv"  # kalman data
 
 
-particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_kalman/073.csv"  # noqa 
-# particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_smooth/073_final.csv"  # noqa
-# particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity/073_RobuGlass3_drainage_174nl_min_run5_velocityPoints_surface_masked.csv"
-ct_files_path = "../data/Segmentations/073_segmented_tifs/*"  # noqa
+particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_final/074.csv"  # noqa 
+ct_files_path = "/Users/chunyang/projects/particle/data/Segmentations/074_segmented_tifs_interpolated/*"  # noqa
+
+
+particle_pred_df_path = "/Users/chunyang/Downloads/74_t150-180.csv"  # noqa
+particle_pred_df_path = "/Users/chunyang/Downloads/74_t150-180 (1).csv"  # noqa 072, 073, 075, no 074 training. nl4 nh32 global stats
 
 # Load the oil surface
 ct_files = glob.glob(ct_files_path) # noqa

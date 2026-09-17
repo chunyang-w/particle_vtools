@@ -23,7 +23,7 @@ from particle_vtools.FluidStructure import FluidIterator_CT
 # from particle_vtools.Particle import ParticleIterator_DF
 # import argparse
 
-save_fig = True
+save_fig = False
 num_frames = 100
 
 drop_percent = 0
@@ -41,7 +41,8 @@ opacity = 0.5
 
 
 # particle_offset = [0, 0, -50]
-particle_offset = [50, 50, 0]
+# particle_offset = [50, 50, 0]
+particle_offset = [0, 0, 0]
 
 frame_start = 10
 frame_end = 40
@@ -63,7 +64,7 @@ pore_tif_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampled
 particle_pred_df_path = "/Users/chunyang/Downloads/73_t10-40.csv"  # no-img-encoder pred
 # particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (10).csv"  # test new rollout
 
-particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_smooth/075_final.csv"  # noqa
+particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_final/075.csv"  # noqa
 ct_files_path = "/Users/chunyang/projects/particle/data/Segmentations/075_segmented_tifs/*"  # noqa
 
 # Load the oil surface

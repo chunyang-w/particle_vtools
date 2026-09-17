@@ -17,8 +17,8 @@ import pyvista as pv
 
 from natsort import natsorted
 
-# from particle_vtools.Explorer3D import Explorer3D
-# from particle_vtools.PoreStructure import PoreStructure_CT
+from particle_vtools.Explorer3D import Explorer3D
+from particle_vtools.PoreStructure import PoreStructure_CT
 from particle_vtools.FluidStructure import FluidIterator_CT
 # from particle_vtools.Particle import ParticleIterator_DF
 # import argparse
@@ -40,7 +40,6 @@ line_width = 3
 opacity = 0.5
 
 
-# particle_offset = [-50, -50, -50]
 particle_offset = [0, 0, 0]
 
 frame_start = 150
@@ -50,27 +49,24 @@ particle_max_height = 1180
 
 show_bar = False
 
-pore_tif_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/073_segmented_00000.tif"  # noqa
+pore_tif_path = "../data/Segmentations/155_segmented_cleaned_filtered_cropped_interpolated/tif_frame_150.tif"  # noqa
 
 # This is single modality prediction
 # particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180_partial_073_teston_073.csv"  # noqa
 
-# Cross modality prediction on 073, 150-180 frames
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (4).csv"  # noqa this is the good one
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (5).csv"  # noqa no-reg
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t120-190.csv"  # noqa
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (8).csv"  # just testing
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (9).csv"  # no-img-encoder pred
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (10).csv"  # test new rollout
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (12).csv"  # new stuff here - with out the offset, now on clearn dataset
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (13).csv"  # new trained nl4 nh32 global stats on 073-075, multipmodal
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (16).csv"  # kalman data
+particle_ground_df_path = "/Users/chunyang/Downloads/155_t150-180 (10).csv"
+ct_files_path = "/Users/chunyang/projects/particle/data/Segmentations/155_segmented_cleaned_filtered_cropped_interpolated/*"  # noqa
 
+pore_tif_path = "../data/rock/141_ketton3_segmented_inverted_cropped.tif"  # noqa
 
-particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_kalman/073.csv"  # noqa 
-# particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_smooth/073_final.csv"  # noqa
-# particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity/073_RobuGlass3_drainage_174nl_min_run5_velocityPoints_surface_masked.csv"
-ct_files_path = "../data/Segmentations/073_segmented_tifs/*"  # noqa
+fluid_slicer = (slice(0, None), slice(0, None), slice(0, None))
+shift = np.array([50, 50, 0]).reshape(-1, 3)
+rock_surface = PoreStructure_CT(
+    pore_tif_path,  # noqa
+    scale=scale,
+    threshold=0,
+    down_sample_factor=down_sample_factor,
+    permute_axes=(2, 1, 0))
 
 # Load the oil surface
 ct_files = glob.glob(ct_files_path) # noqa
@@ -81,7 +77,7 @@ print(ct_files)
 oil_iterator = FluidIterator_CT(
     "oil",
     ct_files,
-    threshold=0,
+    threshold=1,
     scale=scale,
     permute_axes=(2, 1, 0),
     down_sample_factor=down_sample_factor,
@@ -159,25 +155,9 @@ def get_track(
 surface = oil_iterator.get_surface(surface_idx)
 
 
-pred_df = pd.read_csv(particle_pred_df_path)
-selected_idx = pred_df["particle"].unique()
+ground_df = pd.read_csv(particle_ground_df_path)
+selected_idx = ground_df["particle"].unique()
 
-track_pred = get_track(
-    df=pred_df,
-    x_key='x',
-    y_key='y',
-    z_key='z',
-    vx_key='vx',
-    vy_key='vy',
-    vz_key='vz',
-    frame_key='frame',
-    particle_key='particle',
-    frame_start=frame_start,
-    frame_end=frame_end,
-    drop_percent=drop_percent,
-    particle_offset=particle_offset,
-    particle_idx=selected_idx,
-)
 
 ground_df = pd.read_csv(particle_ground_df_path)
 track_ground = get_track(
@@ -199,15 +179,15 @@ track_ground = get_track(
 
 p = pv.Plotter(
     title="Particle Prediction vs Ground Truth",
-    shape=(1, 2),
-    window_size=[2500, 1250])
+    window_size=[2500, 2500])
+
 
 # Window 1 - Ground Truth
 # p.show_grid(
 #     all_edges=True,
-#     show_xlabels=False,
-#     show_ylabels=False,
-#     show_zlabels=False,
+#     show_xlabels=True,
+#     show_ylabels=True,
+#     show_zlabels=True,
 # )
 p.add_text("Ground Truth", font_size=20)
 p.add_mesh(
@@ -237,66 +217,73 @@ p.add_mesh(
     diffuse=1,
     opacity=0.05)
 
-# Window 2 - Prediction
-p.subplot(0, 1)
-# p.show_grid(
-#     all_edges=True,
-#     show_xlabels=False,
-#     show_ylabels=False,
-#     show_zlabels=False,
+rock_mesh = rock_surface.get_surface()
+print(rock_mesh)
+# rock_mesh, rock_mesh_clip = rock_mesh.clip(
+#     # normal=(1, -0.5, 0),
+#     normal=(0, 0, 1),
+#     origin=(0, 0, 0),
+#     return_clipped=True,
+#     invert=True,
+#     value=500)
+
+normal = (0, 0, 1)
+offset = 650
+rock_mesh, rock_mesh_clip = rock_mesh.clip(
+    # normal=(1, -0.5, 0),
+    normal=normal,
+    origin=(0, 0, 0),
+    return_clipped=True,
+    invert=False,
+    value=offset)
+p.add_mesh(
+    rock_mesh_clip,
+    color="grey")
+
+
+origin = (rock_mesh.center[0], rock_mesh.center[1], offset)
+xmin, xmax, ymin, ymax, zmin, zmax = rock_mesh.bounds
+pad = 0.05 * rock_mesh.length
+i_size = (xmax - xmin) + 2*pad
+j_size = (ymax - ymin) + 2*pad
+
+
+# plane_geom = make_plane()
+plane_geom = pv.Plane(center=origin, direction=normal, i_size=i_size, j_size=j_size)
+plane_geom.rotate_z(-120, inplace=True, point=origin)
+# p.add_mesh_clip_plane(
+#     rock_surface.get_surface(),
+#     color="grey",
 # )
-p.add_text("Prediction", font_size=20)
 p.add_mesh(
-    track_pred,
-    scalars='velocity',
-    line_width=line_width,
-    cmap=cmap,
-    render_lines_as_tubes=True,
-    opacity=opacity,
-    clim=[np.quantile(track_ground['velocity'], clim_low),
-          np.quantile(track_ground['velocity'], clim_high)],
+    plane_geom,
+    color="green",
+    opacity=0.2,
 )
-p.add_mesh(
-    surface,
-    color="blue",
-    pbr=True,
-    opacity=0.01)
+print(p)
+# print(p.box_widgets)
+# widget = p.box_widgets[0]
 
-p.add_mesh(
-    surface,
-    style='wireframe',
-    line_width=0.9,
-    color="blue",
-    pbr=True,
-    metallic=0.1,
-    roughness=0.01,
-    diffuse=1,
-    opacity=0.05)
 
-p.link_views()
+# def toggle(*args):
+#     widget.SetEnabled(not widget.GetEnabled())
+
+
+# p.add_key_event('b', toggle)
+
 
 p.camera_position = "yz"
 p.camera.azimuth = -120
 p.camera.elevation = 10
-p.camera.zoom(1.2)
+p.camera.zoom(1.5)
 
-csv_base_name = particle_pred_df_path.split("/")[-1].split(".")[0]
-run_name = f"out/duo_track_{csv_base_name}"
 
 if show_bar:
     pass
 else:
     p.remove_scalar_bar()
+    # pass
 
 if not save_fig:
     p.show()
-
-elif save_fig:
-    p.camera.azimuth = 0
-    
-    p.export_html(f"{run_name}.html")
-    p.open_gif(f"{run_name}.gif", fps=4)
-    for i in range(num_frames):
-        p.camera.azimuth = p.camera.azimuth - 1
-        p.write_frame()
-    p.close()
+    # explorer.explore()

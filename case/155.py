@@ -25,11 +25,11 @@ clim = [0, 10]
 arrow_lim = [0.25, 3]
 
 # # Change the paths to fit your data location
-# Original data
-pore_tif_path = "../data/Ketton155Data/141_ketton3_segmented_inverted.tif"  # noqa
-# pore_tif_path = "../data/CombinedResults/Segmentations/074_segmented_tifs/seg_frame0.tif"  # noqa
-ct_files_path = "../data/Segmentations/155_segmented_cleaned/*"  # noqa
-particle_df_path = "../data/Velocity/155_Drain100x0p5s250nlmin_ft99p5_velocityPoints.csv"  # noqa
+# # Original data
+# pore_tif_path = "../data/Ketton155Data/141_ketton3_segmented_inverted.tif"  # noqa
+# # pore_tif_path = "../data/CombinedResults/Segmentations/074_segmented_tifs/seg_frame0.tif"  # noqa
+# ct_files_path = "../data/Segmentations/155_segmented_cleaned/*"  # noqa
+# particle_df_path = "../data/Velocity/155_Drain100x0p5s250nlmin_ft99p5_velocityPoints.csv"  # noqa
 
 # Filtered data
 # pore_tif_path = "../data/Ketton155Data/141_ketton3_segmented_inverted.tif"  # noqa
@@ -37,13 +37,19 @@ particle_df_path = "../data/Velocity/155_Drain100x0p5s250nlmin_ft99p5_velocityPo
 # particle_df_path = "/Users/chunyang/projects/particle/data/Ketton155Data/155_Drain100x0p5s250nlmin_ft99p5_velocityPoints_surface_masked.csv"  # noqa
 
 # Filtered croped
-# pore_tif_path = "../data/Ketton155Data/141_ketton3_segmented_inverted.tif"  # noqa
-# ct_files_path = "/Users/chunyang/projects/particle/data/Ketton155Data/155_segmented_cleaned_filtered_cropped/*"  # noqa
-# particle_df_path = "/Users/chunyang/projects/particle/data/Ketton155Data/155_Drain100x0p5s250nlmin_ft99p5_velocityPoints_surface_masked.csv"  # noqa
+# pore_tif_path = "/Users/chunyang/projects/particle/data/rock/141_ketton3_segmented_inverted.tif"  # noqa
+# ct_files_path = "/Users/chunyang/projects/particle/arch/Ketton155Data/155_segmented_cleaned/*"  # noqa
+# particle_df_path = "/Users/chunyang/projects/particle/data/Velocity_smooth/155_final.csv"  # noqa
+
+# Filtered croped, with coordinates shifted
+pore_tif_path = "/Users/chunyang/projects/particle/data/rock/141_ketton3_segmented_inverted_cropped.tif"  # noqa
+ct_files_path = "/Users/chunyang/projects/particle/data/Segmentations/155_segmented_cleaned_filtered_cropped/*"  # noqa
+particle_df_path = "/Users/chunyang/projects/particle/data/Velocity_kalman/155.csv"  # noqa
+
 
 if __name__ == "__main__":
     fluid_slicer = (slice(0, None), slice(0, None), slice(0, None))
-    shift = np.array([100, 100, 100]).reshape(-1, 3)
+    shift = np.array([0, 0, 0]).reshape(-1, 3)
     rock_surface = PoreStructure_CT(
         pore_tif_path,  # noqa
         scale=1,
@@ -73,7 +79,7 @@ if __name__ == "__main__":
     explorer = Explorer3D(
         fluid_iterators=[oil_iterator],
         velocity_iterators=[paricle_iterator],
-        # pore_structure=rock_surface,
+        pore_structure=rock_surface,
         clim=clim,
         # clip_panel=clip_panel,
         clip_panel=True,
@@ -83,7 +89,7 @@ if __name__ == "__main__":
 
 
 if not save_fig:
-    explorer.set_scene3d(0)
+    explorer.set_scene3d(2)
     explorer.set_time_slider()
     p = explorer.plotter
     p.camera_position = "yz"

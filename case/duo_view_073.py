@@ -14,9 +14,9 @@ Two view are linked to facilitate the comparison.
 import glob
 import pyvista as pv
 import pandas as pd
-
+import numpy as np
 from natsort import natsorted
-
+from skimage import measure
 from particle_vtools.Explorer3D import Explorer3D
 from particle_vtools.PoreStructure import PoreStructure_CT
 from particle_vtools.FluidStructure import FluidIterator_CT
@@ -27,7 +27,7 @@ import argparse
 parser = argparse.ArgumentParser(
     description="Particle Prediction vs Ground Truth Visualization")
 parser.add_argument(
-    "--save_fig", type=bool, default=False, help="Set to True to save the gif")
+    "--save_fig", type=bool, default=True, help="Set to True to save the gif")
 parser.add_argument(
     "--move_camera", type=bool, default=False, help="Set to True to move the camera for a better 3D view")  # noqa
 parser.add_argument(
@@ -47,7 +47,7 @@ down_sample_factor = args.down_sample_factor
 
 frame_start = 150
 frame_end = 180
-shift_array = [0, 0, -50]
+shift_array = [50, 50, 0]
 
 # Change the paths to fit your data location
 pore_tif_path = "/Users/chunyang/projects/particle/data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left7_compressed.tif"  # noqa
@@ -55,13 +55,58 @@ particle_pred_df_path = "/Users/chunyang/Downloads/073_autoregressive_5noise_pre
 particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_smooth/073_final.csv"  # noqa
 ct_files_path = "/Users/chunyang/projects/particle/data/Segmentations/073_downsampledx2/*"  # noqa
 
+cube_pd = np.load("/Users/chunyang/Downloads/73_t150-180_pd.npy")
+cube_gt = np.load("/Users/chunyang/Downloads/73_t150-180_gt.npy")
+
+
+def cube2mesh(
+    cube,
+    threshold=1,
+    smooth=True,
+    smooth_iter=10,
+    relaxation_factor=0.1,
+):  # noqa E501
+    """
+    Extract the geometry of the surface from a tif data.
+    as well as surface smoothing.
+    """
+    cube = cube == threshold
+    cube = cube.transpose(2, 1, 0)
+    verts, faces, _, _ = measure.marching_cubes(cube, level=0)
+    faces_pv = np.hstack([np.full((faces.shape[0], 1), 3), faces]).astype(
+        np.int64
+    )  # noqa E501
+    faces_pv = faces_pv.flatten()
+    mesh = pv.PolyData(var_inp=verts, faces=faces_pv)
+    if smooth:
+        mesh = mesh.smooth(
+            n_iter=smooth_iter, relaxation_factor=relaxation_factor
+        )  # noqa E501
+    mesh.face_raw = faces
+    return mesh
+
+
+def plot_mesh(t, cube, mesh, scale=8):
+    t = int(t)
+    mesh_new = cube2mesh(
+        cube[t],
+        threshold=0,
+        relaxation_factor=0.2,
+        smooth_iter=20,
+    )
+    mesh.points = mesh_new.points*scale
+    mesh.faces = mesh_new.faces
+    # print("showing frame t: ", t)
+    return mesh_new
+
+
 if __name__ == "__main__":
     # fluid_slicer = (slice(None, -50), slice(50, -50), slice(50, -50))
     # shift = np.array([0, 0, -450]).reshape(-1, 3)
-    scale = 2
+    scale = 8
     rock_surface = PoreStructure_CT(
         pore_tif_path,  # noqa
-        scale=scale,
+        scale=2,
         threshold=0,
         down_sample_factor=down_sample_factor,
         permute_axes=(2, 1, 0))
@@ -126,17 +171,17 @@ if __name__ == "__main__":
 
     # Init explorer
     explorer_pred = Explorer3D(
-        fluid_iterators=[oil_iterator],
+        # fluid_iterators=[oil_iterator],
         velocity_iterators=[particle_iterator_pred],
         pore_structure=rock_surface,
-        num_frames=30, 
+        num_frames=30,
         plotter=p,
         clip_panel=show_clip_panel,
         surface_transparency=0.07,
         )
 
     explorer_ground = Explorer3D(
-        fluid_iterators=[oil_iterator],
+        # fluid_iterators=[oil_iterator],
         velocity_iterators=[particle_iterator_ground],
         pore_structure=rock_surface,
         num_frames=30,
@@ -146,10 +191,13 @@ if __name__ == "__main__":
         )
 
     def update_duo_view(frame_idx):
+        idx_from_zero = frame_idx - frame_start
         p.subplot(0, 0)
         explorer_ground.update_scene3d(frame_idx)
+        plot_mesh(idx_from_zero, cube_gt, mesh_gt)
         p.subplot(0, 1)
         explorer_pred.update_scene3d(frame_idx)
+        plot_mesh(idx_from_zero, cube_pd, mesh_pd)
 
     p.subplot(0, 0)
     # p.show_grid(
@@ -161,6 +209,12 @@ if __name__ == "__main__":
     p.add_text("Ground Truth", font_size=20)
 
     explorer_ground.set_scene3d(frame_start)
+
+    mesh_gt = cube2mesh(cube_gt[0], threshold=0)
+    mesh_gt.points = mesh_gt.points*scale
+    mesh_gt.smooth(n_iter=10, relaxation_factor=0.5)
+    p.add_mesh(mesh_gt, color='blue', opacity=0.02, style='wireframe', line_width=0.5)
+
     p.subplot(0, 1)
     # p.show_grid(
     #     all_edges=True,
@@ -171,11 +225,17 @@ if __name__ == "__main__":
 
     p.add_text("Prediction", font_size=20)
     explorer_pred.set_scene3d(frame_start)
+
+    mesh_pd = cube2mesh(cube_pd[0], threshold=0)
+    mesh_pd.points = mesh_pd.points*scale
+    mesh_pd.smooth(n_iter=10, relaxation_factor=0.5)
+    p.add_mesh(mesh_pd, color='blue', opacity=0.02, style='wireframe', line_width=0.5)
     p.link_views()
 
     p.camera_position = "yz"
-    p.camera.azimuth = -30
-    p.camera.elevation = 15
+    p.camera.azimuth = -145
+    p.camera.elevation = -5
+    p.camera.zoom(1.6)
 
     if not save_fig:
         p.add_slider_widget(
@@ -187,10 +247,9 @@ if __name__ == "__main__":
         p.show()
 
     elif save_fig:
-        p.open_gif(f"compare_move_camera_{move_camera}.gif", fps=8)
+        p.open_movie(f"compare_move_camera_{move_camera}.mp4", framerate=8)
         text_actor = p.add_text(
             "Frame: 0", position="upper_right", font_size=20)
-        p.camera.zoom(1.2)
         for i in range(frame_start, frame_end):
             p.remove_actor(text_actor)
             text_actor = p.add_text(

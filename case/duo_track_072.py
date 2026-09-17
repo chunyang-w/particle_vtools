@@ -23,7 +23,7 @@ from particle_vtools.FluidStructure import FluidIterator_CT
 # from particle_vtools.Particle import ParticleIterator_DF
 # import argparse
 
-save_fig = True
+save_fig = False
 num_frames = 100
 
 drop_percent = 0
@@ -43,15 +43,20 @@ opacity = 0.5
 # frame_start = 150
 # frame_end = frame_start + 30
 
-particle_offset = [50, 50, -460]
+# particle_offset = [50, 50, -460]
+particle_offset = [0, 0, 0]
 
-frame_start = 100
-frame_end = frame_start + 80
+frame_start = 150
+frame_end = frame_start + 30
 # particle_pred_df_path = "/Users/chunyang/Downloads/072_autoregressive_noise5_predictions.csv"  # noqa
 # particle_pred_df_path = "/Users/chunyang/Downloads/72_t150-180_partial_073_teston_072.csv"  # noqa
 # particle_pred_df_path = "/Users/chunyang/Downloads/72_t150-180.csv"  # noqa
 particle_pred_df_path = "/Users/chunyang/Downloads/72_t100-180.csv"  # noqa  long rollout 072
+particle_pred_df_path = "/Users/chunyang/Downloads/72_t100-130.csv"  # new trained nl4 nh32 global stats on 072-075
+particle_pred_df_path = "/Users/chunyang/Downloads/72_t150-180 (2).csv"  # new trained nl4 nh32 global stats on 072-075, multipmodal
+
 particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_smooth/072_final.csv"  # noqa
+particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_final/072.csv"  # noqa
 ct_files_path = "/Users/chunyang/projects/particle/data/Segmentations/072/*"  # noqa
 
 

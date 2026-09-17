@@ -31,11 +31,14 @@ pore_tif_path = "../data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left
 
 # pore_tif_path = "../data/CombinedResults/Segmentations/074_segmented_tifs/seg_frame0.tif"  # noqa
 ct_files_path = "../data/Segmentations/074_segmented_tifs/*"  # noqa
-particle_df_path = "../data/Velocity/074_RobuGlass3_drainage_348nl_min_run6_velocityPoints_surface_masked.csv"  # noqa
+# particle_df_path = "../data/Velocity/074_RobuGlass3_drainage_348nl_min_run6_velocityPoints_surface_masked.csv"  # noqa
+
+# csv with offset applied:
+particle_df_path = "/Users/chunyang/projects/particle/data/Velocity_kalman/074.csv"  # noqa
 
 if __name__ == "__main__":
-    fluid_slicer = (slice(0, None), slice(0, None), slice(0, None))
-    shift = np.array([50, 50, 0]).reshape(-1, 3)
+    # fluid_slicer = (slice(0, None), slice(0, None), slice(0, None))
+    # shift = np.array([50, 50, 0]).reshape(-1, 3)
 
     rock_surface = PoreStructure_CT(
         pore_tif_path,  # noqa
@@ -51,13 +54,15 @@ if __name__ == "__main__":
         "oil", ct_files, threshold=0,
         permute_axes=(2, 1, 0),
         down_sample_factor=down_sample_factor,
-        slicer=fluid_slicer)
+        # slicer=fluid_slicer
+        )
     # Particle data
     particle_df_path = particle_df_path # noqa
     paricle_iterator = ParticleIterator_DF(
         "particle",
         particle_df_path,
-        shift_array=shift,
+        scale_arrow=15,
+        # shift_array=shift,
         arrow_lim=arrow_lim,
         )
 
@@ -65,34 +70,34 @@ if __name__ == "__main__":
     explorer = Explorer3D(
         [oil_iterator],
         [paricle_iterator],
-        rock_surface,
+        pore_structure=rock_surface,
         clim=clim,
         clip_panel=clip_panel,
         )
 
-    # set time slider
-    explorer.plotter.show_grid(
-        all_edges=True,
-        # show_xlabels=False,
-        # show_ylabels=False,
-        # show_zlabels=False,
-    )
+    # # set time slider
+    # explorer.plotter.show_grid(
+    #     all_edges=True,
+    #     # show_xlabels=False,
+    #     # show_ylabels=False,
+    #     # show_zlabels=False,
+    # )
 
 
 if not save_fig:
-    explorer.set_scene3d(0)
+    explorer.set_scene3d(2)
     explorer.set_time_slider()
     explorer.explore()
 elif save_fig:
-    move_camera = True
-    num_frames = [i for i in range(45, 65, 1)]
+    move_camera = False
+    num_frames = [i for i in range(2, 160, 1)]
     p = explorer.plotter
     explorer.set_scene3d(num_frames[0])
     p.camera_position = "yz"
     p.camera.azimuth = 130
     p.camera.elevation = 15
-    p.camera.zoom(2)
-    p.open_gif("compare_flow_direction.gif", fps=2)
+    p.camera.zoom(1.3)
+    p.open_gif("compare_flow_direction.gif", fps=20)
     # p.open_movie("compare_flow_direction.mp4", framerate=2)
 
     text_actor = p.add_text(

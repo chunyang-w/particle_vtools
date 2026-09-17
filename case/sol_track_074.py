@@ -2,12 +2,11 @@
 Author Chunyang Wang
 Github: https://github.com/chunyang-w
 
-A Visulisation script utilising pyvista API to compare the particle tracking
+A Visualisation script utilising pyvista API to display ground truth
+particle tracking.
 
-A 3D scene with two subplots is created to compare the particle tracking
-between the ground truth and the prediction.
-
-Two view are linked to facilitate the comparison.
+A single 3D scene is created to display the ground truth particle tracking
+data along with the fluid geometry.
 """
 
 import glob
@@ -33,55 +32,39 @@ clim_high = 0.95
 down_sample_factor = 8
 scale = 1
 show_surface = True
-surface_idx = 29
 
 cmap = 'jet'
 line_width = 3
 opacity = 0.5
 
 
-# particle_offset = [-50, -50, -50]
+# particle_offset = [0, 0, -50]
 particle_offset = [0, 0, 0]
 
-frame_start = 150
-frame_end = 180
-
+surface_idx = -1
 particle_max_height = 1180
-
 show_bar = False
 
-pore_tif_path = "../data/073_combined_results/073_segmentedTimeSteps_downsampledx2_tif/073_segmented_00000.tif"  # noqa
+# Ground truth data path for 155 dataset
+particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_final/074.csv"  # noqa
+ct_files_path = "/Users/chunyang/projects/particle/data/Segmentations/074_segmented_tifs_interpolated/*"  # noqa
 
-# This is single modality prediction
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180_partial_073_teston_073.csv"  # noqa
-
-# Cross modality prediction on 073, 150-180 frames
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (4).csv"  # noqa this is the good one
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (5).csv"  # noqa no-reg
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t120-190.csv"  # noqa
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (8).csv"  # just testing
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (9).csv"  # no-img-encoder pred
-# particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (10).csv"  # test new rollout
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (12).csv"  # new stuff here - with out the offset, now on clearn dataset
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (13).csv"  # new trained nl4 nh32 global stats on 073-075, multipmodal
-particle_pred_df_path = "/Users/chunyang/Downloads/73_t150-180 (16).csv"  # kalman data
-
-
-particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_kalman/073.csv"  # noqa 
-# particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity_smooth/073_final.csv"  # noqa
-# particle_ground_df_path = "/Users/chunyang/projects/particle/data/Velocity/073_RobuGlass3_drainage_174nl_min_run5_velocityPoints_surface_masked.csv"
-ct_files_path = "../data/Segmentations/073_segmented_tifs/*"  # noqa
+# Frame range for visualization
+frame_start = 10
+frame_end = 50
 
 # Load the oil surface
 ct_files = glob.glob(ct_files_path) # noqa
 ct_files = natsorted(ct_files)
-ct_files = ct_files[frame_start:frame_end]
+print(len(ct_files))
+ct_files = ct_files[frame_start//2:frame_end//2]
+
 print(ct_files)
 
 oil_iterator = FluidIterator_CT(
     "oil",
     ct_files,
-    threshold=0,
+    threshold=1,
     scale=scale,
     permute_axes=(2, 1, 0),
     down_sample_factor=down_sample_factor,
@@ -158,27 +141,7 @@ def get_track(
 # Fluid surface
 surface = oil_iterator.get_surface(surface_idx)
 
-
-pred_df = pd.read_csv(particle_pred_df_path)
-selected_idx = pred_df["particle"].unique()
-
-track_pred = get_track(
-    df=pred_df,
-    x_key='x',
-    y_key='y',
-    z_key='z',
-    vx_key='vx',
-    vy_key='vy',
-    vz_key='vz',
-    frame_key='frame',
-    particle_key='particle',
-    frame_start=frame_start,
-    frame_end=frame_end,
-    drop_percent=drop_percent,
-    particle_offset=particle_offset,
-    particle_idx=selected_idx,
-)
-
+# Load ground truth data
 ground_df = pd.read_csv(particle_ground_df_path)
 track_ground = get_track(
     df=ground_df,
@@ -194,21 +157,14 @@ track_ground = get_track(
     frame_end=frame_end,
     drop_percent=drop_percent,
     particle_offset=particle_offset,
-    particle_idx=selected_idx,
+    particle_idx=None,
 )
 
 p = pv.Plotter(
-    title="Particle Prediction vs Ground Truth",
-    shape=(1, 2),
-    window_size=[2500, 1250])
+    title="Ground Truth Particle Tracking",
+    window_size=[1250, 1250])
 
-# Window 1 - Ground Truth
-# p.show_grid(
-#     all_edges=True,
-#     show_xlabels=False,
-#     show_ylabels=False,
-#     show_zlabels=False,
-# )
+# Add ground truth particle tracks
 p.add_text("Ground Truth", font_size=20)
 p.add_mesh(
     track_ground,
@@ -220,6 +176,8 @@ p.add_mesh(
     clim=[np.quantile(track_ground['velocity'], clim_low),
           np.quantile(track_ground['velocity'], clim_high)],
 )
+
+# Add fluid surface geometry
 p.add_mesh(
     surface,
     color="blue",
@@ -236,52 +194,14 @@ p.add_mesh(
     roughness=0.01,
     diffuse=1,
     opacity=0.05)
-
-# Window 2 - Prediction
-p.subplot(0, 1)
-# p.show_grid(
-#     all_edges=True,
-#     show_xlabels=False,
-#     show_ylabels=False,
-#     show_zlabels=False,
-# )
-p.add_text("Prediction", font_size=20)
-p.add_mesh(
-    track_pred,
-    scalars='velocity',
-    line_width=line_width,
-    cmap=cmap,
-    render_lines_as_tubes=True,
-    opacity=opacity,
-    clim=[np.quantile(track_ground['velocity'], clim_low),
-          np.quantile(track_ground['velocity'], clim_high)],
-)
-p.add_mesh(
-    surface,
-    color="blue",
-    pbr=True,
-    opacity=0.01)
-
-p.add_mesh(
-    surface,
-    style='wireframe',
-    line_width=0.9,
-    color="blue",
-    pbr=True,
-    metallic=0.1,
-    roughness=0.01,
-    diffuse=1,
-    opacity=0.05)
-
-p.link_views()
 
 p.camera_position = "yz"
 p.camera.azimuth = -120
 p.camera.elevation = 10
 p.camera.zoom(1.2)
 
-csv_base_name = particle_pred_df_path.split("/")[-1].split(".")[0]
-run_name = f"out/duo_track_{csv_base_name}"
+# Set output filename
+run_name = f"out/sol_track_155_f{frame_start}-{frame_end}"
 
 if show_bar:
     pass
@@ -293,7 +213,7 @@ if not save_fig:
 
 elif save_fig:
     p.camera.azimuth = 0
-    
+
     p.export_html(f"{run_name}.html")
     p.open_gif(f"{run_name}.gif", fps=4)
     for i in range(num_frames):

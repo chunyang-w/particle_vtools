@@ -76,6 +76,7 @@ class ParticleIterator(ABC):
 
         positions, velocities = self.get_particle(index)
         magnitudes = self.compute_velocity_magnitudes(velocities)
+        # print("min/max magnitudes:", magnitudes.min(), magnitudes.max())
         arrow_sizes = self.map_magnitudes_to_size(
             magnitudes, arrow_min, arrow_max)
 

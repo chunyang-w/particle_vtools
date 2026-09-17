@@ -20,7 +20,7 @@ from particle_vtools.Particle import ParticleIterator_DF
 save_fig = False
 clip_panel = True
 
-down_sample_factor = 8
+down_sample_factor = 4
 clim = [0, 16]
 arrow_lim = [0.1, 3]
 
@@ -30,9 +30,15 @@ pore_tif_path = "../data/rock/001_064_RobuGlass3_rec_16bit_abs_ShiftedDown18Left
 ct_files_path = "../data/Segmentations/073_segmented_tifs/*"  # noqa
 particle_df_path = "../data/Velocity/073_RobuGlass3_drainage_174nl_min_run5_velocityPoints_surface_masked.csv"  # noqa
 
+# csv with offset applied:
+particle_df_path = "/Users/chunyang/projects/particle/data/Velocity_kalman/073.csv"  # noqa
+# particle_df_path = "/Users/chunyang/projects/particle/data/Velocity_final/073.csv"  # noqa
+
+
 if __name__ == "__main__":
-    fluid_slicer = (slice(0, None), slice(0, None), slice(0, None))
-    shift = np.array([50, 50, 0]).reshape(-1, 3)
+    # fluid_slicer = (slice(0, None), slice(0, None), slice(0, None))
+    # fluid_slicer = (slice(None, -50), slice(50, -50), slice(50, -50))
+    # shift = np.array([50, 50, 0]).reshape(-1, 3)
     rock_surface = PoreStructure_CT(
         pore_tif_path,  # noqa
         scale=1,
@@ -47,13 +53,14 @@ if __name__ == "__main__":
         "oil", ct_files, threshold=1,
         permute_axes=(2, 1, 0),
         down_sample_factor=down_sample_factor,
-        slicer=fluid_slicer)
+        # slicer=fluid_slicer
+        )
     # Particle data
     particle_df_path = particle_df_path # noqa
     paricle_iterator = ParticleIterator_DF(
         "particle",
         particle_df_path,
-        shift_array=shift,
+        # shift_array=shift,
         arrow_lim=arrow_lim,
         scale_arrow=15,
         )
@@ -62,7 +69,7 @@ if __name__ == "__main__":
     explorer = Explorer3D(
         fluid_iterators=[oil_iterator],
         velocity_iterators=[paricle_iterator],
-        # pore_structure=rock_surface,
+        pore_structure=rock_surface,
         clim=clim,
         # clip_panel=clip_panel,
         clip_panel=True,
@@ -72,7 +79,7 @@ if __name__ == "__main__":
 
 
 if not save_fig:
-    explorer.set_scene3d(0)
+    explorer.set_scene3d(2)
     explorer.set_time_slider()
     p = explorer.plotter
     p.camera_position = "yz"
